@@ -81,6 +81,21 @@
 .btn-ghost:hover { background: var(--color-ink-deep); color: var(--color-field); transform: translateY(-2px); }
 .btn-ghost:active { transform: translateY(0); }
 
+/* ── Hero: grid ────────────────────────────────────────────────────────── */
+/* A faint terracotta grid behind the name: thin lines, small cells, fading out toward the wavy edge so
+   the bottom of the hero stays clean. Sits under the name, buttons and drips. */
+.hero::before {
+  content: ""; position: absolute; inset: 0; z-index: 0; pointer-events: none;
+  background-image:
+    linear-gradient(to right, rgb(192 90 62 / .16) 1px, transparent 1px),
+    linear-gradient(to bottom, rgb(192 90 62 / .16) 1px, transparent 1px);
+  background-size: 64px 64px;
+  background-position: center top;
+  mask-image: linear-gradient(to bottom, #000 0%, #000 55%, transparent 96%);
+  -webkit-mask-image: linear-gradient(to bottom, #000 0%, #000 55%, transparent 96%);
+}
+@media (max-width: 640px) { .hero::before { background-size: 48px 48px; } }
+
 /* ── Hero: stamped letters ─────────────────────────────────────────────── */
 .hero-name { display: flex; flex-direction: column; align-items: flex-start; }
 .hero-name > span { display: inline-block; }
