@@ -87,12 +87,13 @@
 .hero::before {
   content: ""; position: absolute; inset: 0; z-index: 0; pointer-events: none;
   background-image:
-    linear-gradient(to right, rgb(192 90 62 / .16) 1px, transparent 1px),
-    linear-gradient(to bottom, rgb(192 90 62 / .16) 1px, transparent 1px);
+    linear-gradient(to right, rgb(192 90 62 / .26) 1px, transparent 1px),
+    linear-gradient(to bottom, rgb(192 90 62 / .26) 1px, transparent 1px);
   background-size: 64px 64px;
   background-position: center top;
-  mask-image: linear-gradient(to bottom, #000 0%, #000 55%, transparent 96%);
-  -webkit-mask-image: linear-gradient(to bottom, #000 0%, #000 55%, transparent 96%);
+  /* full strength along the top, easing through the middle, gone before the wave */
+  mask-image: linear-gradient(to bottom, #000 0%, #000 30%, rgb(0 0 0 / .55) 62%, transparent 96%);
+  -webkit-mask-image: linear-gradient(to bottom, #000 0%, #000 30%, rgb(0 0 0 / .55) 62%, transparent 96%);
 }
 @media (max-width: 640px) { .hero::before { background-size: 48px 48px; } }
 
