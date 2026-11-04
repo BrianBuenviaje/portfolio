@@ -26,8 +26,9 @@
 
 @layer base {
   /* proximity, not mandatory: the Specializations stage holds the page itself and needs free positions.
-     overflow-x: clip keeps elements parked off to the side for their entrance from widening the page. */
-  html { scroll-behavior: smooth; scroll-snap-type: y proximity; overflow-x: clip; }
+     overflow-x: clip keeps elements parked off to the side for their entrance from widening the page.
+     scrollbar-gutter: stable keeps the scrollbar's space while Specializations holds the page unscrollable. */
+  html { scroll-behavior: smooth; scroll-snap-type: y proximity; overflow-x: clip; scrollbar-gutter: stable; }
   body { overflow-x: clip; }
   @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; scroll-snap-type: none; } }
   body {

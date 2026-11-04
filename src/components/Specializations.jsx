@@ -7,7 +7,7 @@ const STEP_MS = 320      // gap between one logo starting to draw and the next, 
 const DRAW_MS = 1500     // ring, mark and label of one logo
 const SETTLE_MS = 700    // pause after the last logo before the page is allowed to move on
 
-function Logo({ logo, on, index, size }) {
+function Logo({ logo, on, size }) {
   const ref = useRef(null)
   // Every stroked part gets one dash the length of the path and a gap longer than the path, parked just
   // past the start, so nothing of it (not even a round cap) is on the path until the logo is live.
@@ -37,7 +37,7 @@ function Logo({ logo, on, index, size }) {
           })}
         </svg>
       </svg>
-      <span className="name label whitespace-nowrap text-[9px] text-khaki sm:text-[11px]"><span className="hidden sm:inline">{String(index + 1).padStart(2, '0')} · </span>{logo.name}</span>
+      <span className="name label whitespace-nowrap text-[9px] text-khaki sm:text-[11px]">{logo.name}</span>
     </div>
   )
 }
@@ -85,9 +85,10 @@ function useLayout(ref) {
   return { rows, cell: lay.cell, ring: lay.ring, shifts }
 }
 
-// Heading first, a scroll prompt at the bottom. When the stage fills the screen the page holds still:
-// each scroll gesture draws the next logo, and only when all nine are drawn (plus a short settle) does
-// scrolling continue. Scrolling up lets go without undrawing anything. Plays once per visit.
+// Heading first, a scroll prompt at the bottom. The stage is reached by ordinary scrolling (the page's
+// snapping finishes the last stretch); the moment its top meets the top of the screen the page holds
+// still, each scroll gesture draws the next logo, and only when all nine are drawn (plus a short settle)
+// does scrolling continue. Scrolling up lets go without undrawing anything. Plays once per visit.
 export default function Specializations() {
   const ref = useRef(null)
   const reduce = useReducedMotion()
@@ -95,9 +96,18 @@ export default function Specializations() {
   const [shown, setShown] = useState(0)    // how many are drawn; walks toward count one at a time, never back
   const [done, setDone] = useState(false)
   const [locked, setLocked] = useState(false)
+  // Mirrors of done/locked for the scroll handlers, set at the same moment as the state so nothing waits
+  // for a render. armed goes false on a release and true again once the stage has mostly left the screen.
   const doneRef = useRef(false), lockedRef = useRef(false), armed = useRef(true), lockY = useRef(0)
+  const settling = useRef(false)   // gliding back after an overshoot; the pin and the drawing wait for it
+  const letGo = useRef(null)       // detaches the hold's input listeners
   const { rows, cell, ring, shifts } = useLayout(ref)
-  doneRef.current = done; lockedRef.current = locked
+
+  const finish = () => {
+    doneRef.current = true; lockedRef.current = false; settling.current = false
+    letGo.current?.()
+    setCount(N); setShown(N); setDone(true); setLocked(false)
+  }
 
   // The queue.
   useEffect(() => {
@@ -109,84 +119,109 @@ export default function Specializations() {
   // All drawn: let the last one finish, settle, then release the page.
   useEffect(() => {
     if (done || shown < N) return
-    const t = setTimeout(() => { setDone(true); setLocked(false) }, reduce ? 0 : DRAW_MS + SETTLE_MS)
+    const t = setTimeout(finish, reduce ? 0 : DRAW_MS + SETTLE_MS)
     return () => clearTimeout(t)
-  }, [shown, done, reduce])
+  }, [shown, done, reduce])   // eslint-disable-line react-hooks/exhaustive-deps
 
   // Reduced motion: everything at once, never hold the page.
-  useEffect(() => { if (reduce) { setCount(N); setShown(N); setDone(true) } }, [reduce])
+  useEffect(() => { if (reduce) finish() }, [reduce])   // eslint-disable-line react-hooks/exhaustive-deps
 
   // A nav jump past this stage finishes it instantly instead of catching the jump.
   useEffect(() => {
-    const onRelease = () => { if (!doneRef.current) { setCount(N); setShown(N); setDone(true); setLocked(false) } }
+    const onRelease = () => { if (!doneRef.current) finish() }
     document.addEventListener('spec:release', onRelease)
     return () => document.removeEventListener('spec:release', onRelease)
-  }, [])
+  }, [])   // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Engage when the stage fills most of the screen; re-arm only after it has mostly left again.
+  // The hold. Nothing moves the page on its own: it is pinned where the reader's own scrolling (or the
+  // page's snapping) put it, and only a fast scroll that carried it past the top gets a short glide back.
   useEffect(() => {
     if (reduce) return
     const section = ref.current?.closest('section')
     if (!section) return
-    const io = new IntersectionObserver((entries) => entries.forEach((e) => {
-      if (e.intersectionRatio < 0.3) armed.current = true
-      if (doneRef.current || lockedRef.current || !armed.current) return
-      if (e.intersectionRatio >= 0.6) {
-        const top = section.getBoundingClientRect().top + window.scrollY
-        window.scrollTo({ top, behavior: 'instant' })
-        lockY.current = top
-        setLocked(true)
-      }
-    }), { threshold: [0, 0.3, 0.6, 1] })
-    io.observe(section)
-    return () => io.disconnect()
-  }, [reduce])
-
-  // While held: downward gestures ask for the next logo, upward ones let go, and the page is pinned.
-  useEffect(() => {
-    if (!locked) return
-    let active = true, acc = 0, touchY = null
+    let acc = 0, touchY = null, lastY = window.scrollY
     const request = (n = 1) => setCount((c) => Math.min(N, c + n))
-    const release = () => { active = false; armed.current = false; setLocked(false) }
     // Every 60px of wheel travel asks for one more logo, so a flick queues several; the queue still
-    // draws them one at a time.
+    // draws them one at a time. Gestures during the glide back are swallowed, not counted.
     const onWheel = (e) => {
-      if (!active) return
       if (e.deltaY < 0) { release(); return }
       e.preventDefault()
+      if (settling.current) return
       acc += e.deltaY
       const n = Math.floor(acc / 60)
       if (n > 0) { acc -= n * 60; request(n) }
     }
     const onTouchStart = (e) => { touchY = e.touches[0].clientY }
     const onTouchMove = (e) => {
-      if (!active) return
       if (touchY == null) { touchY = e.touches[0].clientY; return }
       const dy = touchY - e.touches[0].clientY   // positive: finger moved up, i.e. scrolling down
       if (dy < -30) { release(); return }
       e.preventDefault()
+      if (settling.current) return
       if (dy > 36) { touchY = e.touches[0].clientY; request() }
     }
     const onKey = (e) => {
-      if (!active) return
-      if (['ArrowDown', 'PageDown', ' ', 'End'].includes(e.key)) { e.preventDefault(); request() }
+      if (['ArrowDown', 'PageDown', ' ', 'End'].includes(e.key)) { e.preventDefault(); if (!settling.current) request() }
       else if (['ArrowUp', 'PageUp', 'Home'].includes(e.key)) release()
     }
-    const onScroll = () => { if (active && Math.abs(window.scrollY - lockY.current) > 1) window.scrollTo({ top: lockY.current, behavior: 'instant' }) }
-    window.addEventListener('wheel', onWheel, { passive: false })
-    window.addEventListener('touchstart', onTouchStart, { passive: true })
-    window.addEventListener('touchmove', onTouchMove, { passive: false })
-    window.addEventListener('keydown', onKey)
-    window.addEventListener('scroll', onScroll)
-    return () => {
-      active = false
-      window.removeEventListener('wheel', onWheel)
-      window.removeEventListener('touchstart', onTouchStart)
-      window.removeEventListener('touchmove', onTouchMove)
-      window.removeEventListener('keydown', onKey)
-      window.removeEventListener('scroll', onScroll)
+    // Input listeners live only while held, attached the moment the hold starts (not after a render),
+    // so no gesture slips through between the two.
+    const listen = (on) => {
+      const f = on ? window.addEventListener.bind(window) : window.removeEventListener.bind(window)
+      f('wheel', onWheel, { passive: false })
+      f('touchstart', onTouchStart, { passive: true })
+      f('touchmove', onTouchMove, { passive: false })
+      f('keydown', onKey)
     }
-  }, [locked])
+    // The page itself is made unscrollable while held (its scrollbar gutter stays, so nothing shifts):
+    // once a scroll is in motion the browser delivers the rest of its wheel events as non-cancellable,
+    // and a frame of movement pulled straight back reads as the page straining against the hold.
+    const html = document.documentElement
+    const unhold = () => { listen(false); html.style.overflowY = '' }
+    const release = () => { unhold(); lockedRef.current = false; settling.current = false; armed.current = false; setLocked(false) }
+    const engage = () => {
+      const top = section.getBoundingClientRect().top + window.scrollY
+      lockY.current = top; lockedRef.current = true; acc = 0; touchY = null
+      listen(true); html.style.overflowY = 'hidden'; setLocked(true)
+      if (Math.abs(window.scrollY - top) < 1) return
+      // Overshot: glide back. The target is a snap point, so the browser's own snapping agrees with it.
+      // Should something keep pushing the page away (a fling still running), pin it instead.
+      settling.current = true
+      window.scrollTo({ top, behavior: 'smooth' })
+      const t0 = performance.now()
+      let prev = window.scrollY, away = 0
+      const landed = () => {
+        if (!settling.current) return
+        const y = window.scrollY
+        away = Math.abs(y - top) > Math.abs(prev - top) ? away + 1 : 0
+        prev = y
+        if (Math.abs(y - top) < 1) settling.current = false
+        else if (away >= 2 || performance.now() - t0 > 800) { settling.current = false; window.scrollTo({ top, behavior: 'instant' }) }
+        else requestAnimationFrame(landed)
+      }
+      requestAnimationFrame(landed)
+    }
+    // Engage when the stage's top reaches the top of the screen: on the way down a small overshoot (one
+    // frame of fast scrolling) still counts; from below only an exact landing does, so the hold never
+    // drags the page against the direction it was going.
+    const check = (down) => {
+      if (doneRef.current || lockedRef.current || !armed.current) return
+      const top = section.getBoundingClientRect().top
+      if (top <= 4 && top > (down ? -window.innerHeight * 0.45 : -4)) engage()
+    }
+    const onScroll = () => {
+      const y = window.scrollY, down = y > lastY
+      lastY = y
+      if (!lockedRef.current) { check(down); return }
+      if (!settling.current && Math.abs(y - lockY.current) > 1) window.scrollTo({ top: lockY.current, behavior: 'instant' })
+    }
+    const io = new IntersectionObserver((entries) => entries.forEach((e) => { if (e.intersectionRatio < 0.3) armed.current = true }), { threshold: [0, 0.3] })
+    io.observe(section)
+    window.addEventListener('scroll', onScroll, { passive: true })
+    letGo.current = unhold
+    check(true)   // a page restored or re-mounted at this stage holds straight away
+    return () => { io.disconnect(); unhold(); window.removeEventListener('scroll', onScroll); letGo.current = null }
+  }, [reduce])
 
   return (
     <div ref={ref}>
@@ -197,7 +232,7 @@ export default function Specializations() {
             <div key={r} className="flex justify-center" style={{ transform: shifts[r] ? `translateX(${shifts[r]}px)` : 'none' }}>
               {row.map((logo, j) => (
                 <div key={logo.id} style={{ width: cell }} className="flex justify-center">
-                  <Logo logo={logo} on={first + j < shown} index={first + j} size={ring} />
+                  <Logo logo={logo} on={first + j < shown} size={ring} />
                 </div>
               ))}
             </div>
