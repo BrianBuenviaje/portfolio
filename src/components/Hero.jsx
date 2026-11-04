@@ -136,7 +136,14 @@ export default function Hero() {
       const count = SITE.first.length + SITE.last.length
       timer = setTimeout(() => paint.classList.add('on'), count * 85 + 650)
     }
-    if (document.fonts?.ready) document.fonts.ready.then(start); else start()
+    // Start when the font is in, or after 1.5 s at most so a slow font never stalls the hero; if the
+    // font lands later the drips are measured again against it.
+    let fontsIn = false
+    const onFonts = () => { fontsIn = true; start() }
+    if (document.fonts?.ready) {
+      document.fonts.ready.then(onFonts)
+      setTimeout(() => { if (!fontsIn) start() }, 1500)
+    } else start()
     let rt
     const onResize = () => { clearTimeout(rt); rt = setTimeout(() => { buildEdge(); buildDrips() }, 120) }
     window.addEventListener('resize', onResize)

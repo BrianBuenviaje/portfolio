@@ -4,9 +4,9 @@ import Nav from './components/Nav.jsx'
 import Hero from './components/Hero.jsx'
 import Stage from './components/Stage.jsx'
 import Hello from './components/Hello.jsx'
+import Specializations from './components/Specializations.jsx'
 import Work from './components/Work.jsx'
 import Experience from './components/Experience.jsx'
-import Specializations, { SPEC_SCROLL } from './components/Specializations.jsx'
 import Contact from './components/Contact.jsx'
 import Footer from './components/Footer.jsx'
 
@@ -19,12 +19,33 @@ function offsetWithin(el, container) {
   return y
 }
 
+// Every element marked data-reveal animates in as it enters the middle band of the screen and out as it
+// nears an edge, sliding back the way it came. data-out records which edge it is leaving through.
+function useReveal() {
+  useEffect(() => {
+    const io = new IntersectionObserver(
+      (entries) => entries.forEach((e) => {
+        const el = e.target
+        if (e.isIntersecting) el.classList.add('in')
+        else { el.dataset.out = e.boundingClientRect.top < 0 ? 'up' : 'down'; el.classList.remove('in') }
+      }),
+      { rootMargin: '-6% 0px -9% 0px', threshold: 0 },
+    )
+    const observeAll = () => document.querySelectorAll('[data-reveal]').forEach((el) => io.observe(el))
+    observeAll()
+    const mo = new MutationObserver(observeAll)
+    mo.observe(document.body, { childList: true, subtree: true })
+    return () => { io.disconnect(); mo.disconnect() }
+  }, [])
+}
+
 export default function App() {
   const railRef = useRef(null)
   const [statuses, setStatuses] = useState({})
   const [fill, setFill] = useState(0)
   const [active, setActive] = useState(null)
   const els = useRef({})
+  useReveal()
 
   const onStatus = useCallback((id, status, el) => {
     els.current[id] = el
@@ -77,12 +98,7 @@ export default function App() {
         </div>
 
         <div className="relative z-10 bg-ground">
-          {/* Specializations is scroll-driven: a tall wrapper with the stage stuck inside it. */}
-          <div className="snap relative" style={{ height: `calc(100svh + ${SPEC_SCROLL})` }}>
-            <div className="sticky top-0 h-[100svh]">
-              <Stage stage={byId.spec} onStatus={onStatus} snap={false} className="h-[100svh] min-h-0 [&::before]:top-[calc(50%-6px)]"><Specializations /></Stage>
-            </div>
-          </div>
+          <Stage stage={byId.spec} onStatus={onStatus} className="[&::before]:top-[calc(50%-6px)]"><Specializations /></Stage>
           <Stage stage={byId.build} onStatus={onStatus}><Work live={live('build')} /></Stage>
           <Stage stage={byId.ship} onStatus={onStatus}><Experience /></Stage>
           <Stage stage={byId.contact} onStatus={onStatus}><Contact /></Stage>

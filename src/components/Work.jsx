@@ -1,6 +1,40 @@
 import { useEffect, useRef, useState } from 'react'
 import { PROJECTS } from '../data/content.js'
 
+const NODE_W = 100, NODE_H = 36
+
+function edgePath(a, b) {
+  const x1 = a.x + NODE_W, y1 = a.y + NODE_H / 2, x2 = b.x, y2 = b.y + NODE_H / 2
+  if (Math.abs(y1 - y2) < 1) return `M${x1} ${y1} H${x2}`
+  const mx = (x1 + x2) / 2
+  return `M${x1} ${y1} H${mx} V${y2} H${x2}`
+}
+
+// Boxes and lines in the same mono labels as the rest of the page. Data flows along the edges while the
+// stage is live.
+function Diagram({ diagram, title }) {
+  const byId = Object.fromEntries(diagram.nodes.map((n) => [n.id, n]))
+  return (
+    <svg viewBox="0 0 520 150" className="block h-auto w-full max-w-full" role="img" aria-label={`System diagram for ${title}`}>
+      {diagram.edges.map(([a, b]) => {
+        const d = edgePath(byId[a], byId[b])
+        return (
+          <g key={a + b}>
+            <path d={d} fill="none" stroke="var(--color-line)" strokeWidth="1.5" />
+            <path d={d} className="flow" />
+          </g>
+        )
+      })}
+      {diagram.nodes.map((n) => (
+        <g key={n.id}>
+          <rect x={n.x} y={n.y} width={NODE_W} height={NODE_H} rx="2" fill="var(--color-ground)" stroke="var(--color-ink)" strokeWidth="1.5" />
+          <text x={n.x + NODE_W / 2} y={n.y + 22} textAnchor="middle" fontFamily="var(--font-mono)" fontSize="10.5" fill="var(--color-ink)" letterSpacing=".04em">{n.label}</text>
+        </g>
+      ))}
+    </svg>
+  )
+}
+
 function Fact({ value, suffix, label, live }) {
   const [shown, setShown] = useState(value)
   useEffect(() => {
@@ -25,24 +59,32 @@ function Fact({ value, suffix, label, live }) {
   )
 }
 
-// Project list on the left, one sticky panel on the right. Picking a project cross-fades the panel;
-// picking the one already open does nothing.
+const TABS = [
+  { id: 'front', label: 'Frontend' },
+  { id: 'back', label: 'Backend' },
+]
+
+// Project list on the left, one sticky panel on the right. The panel has two tabs: Frontend (screenshot
+// and product story) and Backend (system diagram and what runs behind it). Picking a project or a tab
+// cross-fades the panel; picking the one already open does nothing.
 export default function Work({ live }) {
   const [index, setIndex] = useState(0)
-  const [shown, setShown] = useState(0)
+  const [tab, setTab] = useState('front')
+  const [shown, setShown] = useState({ index: 0, tab: 'front' })
   const [fading, setFading] = useState(false)
   const timer = useRef(null)
 
-  const pick = (i) => {
-    if (i === index) return
-    setIndex(i)
+  const swap = (next) => {
     setFading(true)
     clearTimeout(timer.current)
-    timer.current = setTimeout(() => { setShown(i); setFading(false) }, 280)
+    timer.current = setTimeout(() => { setShown(next); setFading(false) }, 280)
   }
+  const pick = (i) => { if (i === index) return; setIndex(i); swap({ index: i, tab }) }
+  const pickTab = (t) => { if (t === tab) return; setTab(t); swap({ index, tab: t }) }
   useEffect(() => () => clearTimeout(timer.current), [])
 
-  const p = PROJECTS[shown]
+  const p = PROJECTS[shown.index]
+  const back = shown.tab === 'back'
 
   return (
     <div className="grid items-start gap-8 lg:grid-cols-[1.15fr_1fr] lg:gap-x-14">
@@ -64,21 +106,42 @@ export default function Work({ live }) {
       </div>
 
       <aside data-reveal="right" style={{ '--i': 4 }} className="min-w-0 overflow-hidden border border-ink bg-ground p-4 lg:sticky lg:top-20 lg:max-h-[calc(100svh-6rem)] lg:overflow-y-auto" aria-live="polite">
-        <div className={`panel-body grid min-w-0 gap-3 ${fading ? 'fading' : ''}`}>
-          <div className="flex justify-between gap-3 label text-[11px] text-khaki">
-            <span className="truncate">{p.meta.split(' · ')[0]} · {p.year}</span>
-            <span className="shrink-0">Run {shown + 1} of {PROJECTS.length}</span>
+        <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
+          <div className="flex gap-1" role="tablist" aria-label="Project view">
+            {TABS.map((t) => (
+              <button
+                key={t.id}
+                type="button"
+                role="tab"
+                aria-selected={tab === t.id}
+                onClick={() => pickTab(t.id)}
+                className={`label rounded-full px-3 py-1.5 text-[11px] transition-colors duration-200 ${tab === t.id ? 'bg-terra text-white' : 'text-khaki hover:bg-ink/10 hover:text-ink'}`}
+              >
+                {t.label}
+              </button>
+            ))}
           </div>
-          <p className="text-[19px] font-semibold leading-tight tracking-[-.01em]">{p.headline}</p>
-          <img
-            src={p.image.src}
-            srcSet={p.image.srcSet}
-            sizes="(min-width: 1024px) 480px, 90vw"
-            alt={p.image.alt}
-            loading="lazy"
-            className="block h-auto w-full max-w-full rounded-[4px] border border-line"
-          />
-          <p className="max-w-[52ch] text-[14px] leading-snug">{p.summary}</p>
+          <span className="label text-[11px] text-khaki">Run {shown.index + 1} of {PROJECTS.length}</span>
+        </div>
+
+        <div className={`panel-body grid min-w-0 gap-3 ${fading ? 'fading' : ''}`}>
+          <p className="label text-[11px] text-khaki">{p.meta.split(' · ')[0]} · {p.year}</p>
+          <p className="text-[19px] font-semibold leading-tight tracking-[-.01em]">{back ? p.backendHeadline : p.headline}</p>
+          {back ? (
+            <div className="w-full max-w-full overflow-hidden rounded-[4px] border border-line bg-ground px-3 py-4">
+              <Diagram diagram={p.diagram} title={p.title} />
+            </div>
+          ) : (
+            <img
+              src={p.image.src}
+              srcSet={p.image.srcSet}
+              sizes="(min-width: 1024px) 480px, 90vw"
+              alt={p.image.alt}
+              loading="lazy"
+              className="block h-auto w-full max-w-full rounded-[4px] border border-line"
+            />
+          )}
+          <p className="max-w-[52ch] text-[14px] leading-snug">{back ? p.backend : p.summary}</p>
           <div className="grid grid-cols-3 gap-3 border-t border-line pt-3">
             {p.facts.map(([v, s, l], i) => <Fact key={p.id + i} value={v} suffix={s} label={l} live={live} />)}
           </div>

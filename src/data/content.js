@@ -35,6 +35,9 @@ export const PROJECTS = [
     headline: 'Ordering and operations for a food business',
     summary:
       'Customers order and track. Admins run inventory, ingredient batches with expiry, production, resupply and sales reports. I owned the Django backend: JWT roles, PayMongo checkout and its payment webhooks.',
+    backendHeadline: 'Django REST API, JWT roles and payment webhooks',
+    backend:
+      'A React app talks to a Django REST Framework API. JWT tokens carry one of three roles: customer, admin, supplier. PayMongo handles checkout and calls back a webhook that marks orders paid or refunded. Postgres holds products, orders, ingredient batches with expiry dates and restock levels.',
     tech: ['React', 'Django', 'DRF', 'PostgreSQL', 'PayMongo', 'Tailwind'],
     facts: [
       ['23', '', 'frontend pages'],
@@ -63,6 +66,9 @@ export const PROJECTS = [
     headline: 'The resort’s website, rebuilt from the ground up',
     summary:
       'A frontend reimagining of the official Malagos Garden Resort site in Davao City. Hand-built with HTML, CSS and vanilla JavaScript into a responsive, feature-rich experience that works on every device.',
+    backendHeadline: 'No server at all: static files on the edge',
+    backend:
+      'Deliberately serverless. Every page is static HTML, CSS and JavaScript served from Vercel’s edge network, so there is nothing to patch, scale or pay for. Booking and enquiries hand off to the resort’s existing channels by link.',
     tech: ['HTML', 'CSS', 'JavaScript', 'Vercel'],
     facts: [
       ['1', '', 'live client'],
@@ -90,6 +96,9 @@ export const PROJECTS = [
     headline: 'Passwords that also check how you type',
     summary:
       'A Python desktop app that hardens login with behavioral biometrics. It captures microsecond variations in typing rhythm, key dwell and flight times, and scores them against a baseline profile, blocking impostors even when they know the password.',
+    backendHeadline: 'A scoring pipeline from keystrokes to a verdict',
+    backend:
+      'Key events are timestamped as they arrive. Dwell (how long a key is held) and flight (the gap between keys) become per-user feature statistics. A login attempt is scored against the stored baseline profile and accepted or blocked on the distance, so the password alone is never enough.',
     tech: ['Python', 'Biometrics', 'Statistics'],
     facts: [
       ['2', '', 'timing signals: dwell, flight'],
