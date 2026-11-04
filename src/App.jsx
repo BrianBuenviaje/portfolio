@@ -81,7 +81,7 @@ export default function App() {
           <div id="hello-rest" className="snap h-[100svh]" aria-hidden="true" />
         </div>
 
-        <div className="relative z-10 bg-ground">
+        <div className="relative z-10">
           <Stage stage={byId.spec} className="[&::before]:top-[calc(50%-6px)]"><Specializations /></Stage>
           <Stage stage={byId.build}><Work /></Stage>
           <Stage stage={byId.ship}><Experience /></Stage>
