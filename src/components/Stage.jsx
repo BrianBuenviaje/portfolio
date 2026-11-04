@@ -44,7 +44,6 @@ export default function Stage({ stage, onStatus, children, className = '', snap 
               as the heading's size; at that size its centre sits within a pixel of the cap centre on the baseline. */}
           <span data-reveal="left" aria-hidden="true" style={{ '--i': 0, fontSize: 'calc(clamp(26px, 7vw, 80px) * 1.15)', fontFamily: 'var(--font-mark)', fontWeight: 700, lineHeight: 0.85 }} className="text-terra">&gt;</span>
           <h2 data-reveal="left" style={{ '--i': 1, fontSize: 'clamp(26px, 7vw, 80px)' }} className="display">{stage.title}</h2>
-          <span data-reveal="right" style={{ '--i': 2 }} className="status ml-auto inline-flex items-center gap-2 border border-line px-2.5 py-1 label text-[11.5px] text-khaki">{status}</span>
         </div>
         {children}
       </div>

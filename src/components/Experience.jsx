@@ -25,7 +25,7 @@ export default function Experience() {
                 className="label group justify-self-start text-left text-khaki transition-colors hover:text-ink md:justify-self-end"
                 aria-label={`Open certificate: ${x.certificate.alt}`}
               >
-                <img src={x.certificate.thumb} alt="" loading="lazy" className="mb-1 h-14 w-auto rounded-[3px] border border-line transition-transform duration-200 group-hover:-translate-y-0.5" />
+                <img src={x.certificate.thumb} alt="" loading="lazy" className="mb-1.5 h-28 w-auto rounded-[3px] border border-line transition-transform duration-200 group-hover:-translate-y-0.5 lg:h-40" />
                 Certificate
               </button>
             )}

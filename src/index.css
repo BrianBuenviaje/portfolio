@@ -191,12 +191,6 @@
 }
 .stage.running::before, .stage.done::before { border-color: var(--color-rail); }
 .stage.done::before { background: var(--color-rail); }
-.status::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--color-line); }
-.stage.running .status { border-color: var(--color-terra); color: var(--color-terra); }
-.stage.running .status::before { background: var(--color-terra); animation: blink 1s steps(2, start) infinite; }
-.stage.done .status { border-color: var(--color-ink); color: var(--color-ink); }
-.stage.done .status::before { background: var(--color-ink); }
-@keyframes blink { to { visibility: hidden; } }
 
 /* Project row: indents and gains a terracotta bar when hovered or active. */
 .proj { transition: padding-left .3s var(--ease-out-soft); }
