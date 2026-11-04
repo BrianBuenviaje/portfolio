@@ -89,6 +89,67 @@ export const PROJECTS = [
     },
   },
   {
+    id: 'soil-states',
+    title: 'Soil States',
+    year: '2026',
+    meta: 'Solo · Thesis · Python · scikit-learn · IoT sensors',
+    headline: 'Soil condition states from cheap sensors, no lab labels',
+    summary:
+      'Undergraduate thesis. Five low-cost IoT nodes logged moisture, pH and temperature for a month. The pipeline finds four recurring soil states without laboratory labels, checks them by leaving one node out, trains a Random Forest to assign new readings, and ships a phone app that turns each state into advice from a rule base.',
+    backendHeadline: 'Unsupervised states, a Random Forest and a rule engine',
+    backend:
+      'Readings are cleaned and turned into per-node features. Clustering on the training month finds the states; a leave-one-node-out check confirms they are not just the sensor locations. A tuned Random Forest assigns states to the test week at 93% accuracy. A threshold-based expert system maps states to eight irrigation and nutrient rules the monitor app shows.',
+    tech: ['Python', 'scikit-learn', 'pandas', 'Random Forest', 'Expert system', 'PWA'],
+    facts: [
+      ['3029', '', 'sensor readings, 5 nodes'],
+      ['4', '', 'soil states found'],
+      ['93.1', '%', 'test-week accuracy'],
+    ],
+    links: { repo: 'https://github.com/BVADBuenviaje/soil_condition_states' },
+    image: { src: '/projects/soil-states-1200.webp', srcSet: '/projects/soil-states-640.webp 640w, /projects/soil-states-1200.webp 1200w', alt: 'Soil Condition Monitor app: nodes, advice and past-week views' },
+    diagram: {
+      nodes: [
+        { id: 'nodes', label: '5 iot nodes', x: 18, y: 57 },
+        { id: 'feat', label: 'features', x: 150, y: 57 },
+        { id: 'cluster', label: 'clustering', x: 290, y: 22 },
+        { id: 'rf', label: 'random forest', x: 290, y: 92 },
+        { id: 'app', label: 'rules + app', x: 420, y: 57 },
+      ],
+      edges: [['nodes', 'feat'], ['feat', 'cluster'], ['feat', 'rf'], ['cluster', 'app'], ['rf', 'app']],
+    },
+  },
+  {
+    id: 'medpal',
+    title: 'MedPal',
+    year: '2026',
+    meta: 'Team of 5 · Next.js · Supabase · AWS Textract · Comprehend Medical · Bedrock',
+    headline: 'Reads a prescription from a photo and explains it in Bisaya',
+    summary:
+      'A mobile-first PWA for patients. Photograph a prescription or lab result; the app reads it, pulls out the medicines, checks interactions and explains them in Bisaya, Filipino or English, with reminders and a chat for follow-up questions. I built the core API endpoints and fixed the mobile layouts.',
+    backendHeadline: 'Three AWS services chained behind Next.js API routes',
+    backend:
+      'Next.js route handlers take the photo and hand it to AWS Textract for text, then Comprehend Medical to pull out medicines at a confidence floor, then Bedrock to explain interactions in the chosen language. Supabase handles sign-in, records and reminders. Without AWS keys the chain falls back to mock responses so the app still runs locally.',
+    tech: ['Next.js', 'TypeScript', 'Supabase', 'AWS Textract', 'Comprehend Medical', 'Bedrock', 'Tailwind'],
+    facts: [
+      ['3', '', 'AWS services chained'],
+      ['3', '', 'languages'],
+      ['7', '', 'API routes'],
+    ],
+    links: { repo: 'https://github.com/KeyBIND-AWS/medpal' },
+    image: { src: '/projects/medpal-1200.webp', srcSet: '/projects/medpal-640.webp 640w, /projects/medpal-1200.webp 1200w', alt: 'MedPal app screens' },
+    diagram: {
+      nodes: [
+        { id: 'cam', label: 'camera', x: 18, y: 57 },
+        { id: 'api', label: 'next.js api', x: 150, y: 57 },
+        { id: 'ocr', label: 'textract', x: 290, y: 22 },
+        { id: 'med', label: 'comprehend', x: 290, y: 92 },
+        { id: 'llm', label: 'bedrock', x: 420, y: 22 },
+        { id: 'db', label: 'supabase', x: 420, y: 92 },
+      ],
+      edges: [['cam', 'api'], ['api', 'ocr'], ['ocr', 'med'], ['med', 'llm'], ['api', 'db']],
+    },
+  },
+  {
     id: 'keystroke-auth',
     title: 'Keystroke Auth',
     year: '2024',
@@ -121,6 +182,18 @@ export const PROJECTS = [
 ]
 
 export const EXPERIENCE = [
+  {
+    id: 'infinityhub',
+    when: 'May 2026 — Jun 2026',
+    org: 'GAC Infinity Hub',
+    role: 'Web developer · On-the-job trainee · 240 hours · Davao City',
+    bullets: [
+      'Built ManPro Academy, an EdTech learning platform: Laravel 12 and React 18 joined by Inertia, with Material UI.',
+      'Course creation, learner enrollment with payments, and an affiliate referral system with HMAC-signed callbacks to a partner platform.',
+      'Role-based access for admins, instructors, affiliates and learners; forms and surveys for assessments.',
+    ],
+    certificate: { thumb: '/experiences/infinityhub-certificate-thumb.webp', full: '/experiences/infinityhub-certificate-full.webp', alt: 'GAC Infinity Hub certificate of completion, Web Developer on-the-job trainee, May 18 to June 22 2026, 240 hours' },
+  },
   {
     id: 'hydramed',
     when: 'Feb 2026 — May 2026',

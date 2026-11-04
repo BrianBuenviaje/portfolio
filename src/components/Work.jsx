@@ -124,32 +124,34 @@ export default function Work({ live }) {
           <span className="label text-[11px] text-khaki">Run {shown.index + 1} of {PROJECTS.length}</span>
         </div>
 
+        {/* Fixed-height slots so the card is the same size for every project and both tabs: a two-line
+            headline, a 2.11:1 media box, and a five-line description. */}
         <div className={`panel-body grid min-w-0 gap-3 ${fading ? 'fading' : ''}`}>
           <p className="label text-[11px] text-khaki">{p.meta.split(' · ')[0]} · {p.year}</p>
-          <p className="text-[19px] font-semibold leading-tight tracking-[-.01em]">{back ? p.backendHeadline : p.headline}</p>
-          {back ? (
-            <div className="w-full max-w-full overflow-hidden rounded-[4px] border border-line bg-ground px-3 py-4">
-              <Diagram diagram={p.diagram} title={p.title} />
-            </div>
-          ) : (
-            <img
-              src={p.image.src}
-              srcSet={p.image.srcSet}
-              sizes="(min-width: 1024px) 480px, 90vw"
-              alt={p.image.alt}
-              loading="lazy"
-              className="block h-auto w-full max-w-full rounded-[4px] border border-line"
-            />
-          )}
-          <p className="max-w-[52ch] text-[14px] leading-snug">{back ? p.backend : p.summary}</p>
-          <div className="grid grid-cols-3 gap-3 border-t border-line pt-3">
+          <p className="line-clamp-2 min-h-[2.5em] text-[19px] font-semibold leading-tight tracking-[-.01em]">{back ? p.backendHeadline : p.headline}</p>
+          <div className="aspect-[2.11] w-full max-w-full overflow-hidden rounded-[4px] border border-line bg-ground">
+            {back ? (
+              <div className="flex h-full w-full items-center px-3"><Diagram diagram={p.diagram} title={p.title} /></div>
+            ) : (
+              <img
+                src={p.image.src}
+                srcSet={p.image.srcSet}
+                sizes="(min-width: 1024px) 480px, 90vw"
+                alt={p.image.alt}
+                loading="lazy"
+                className="block h-full w-full object-cover object-top"
+              />
+            )}
+          </div>
+          <p className="line-clamp-5 min-h-[6.9em] max-w-[52ch] text-[14px] leading-[1.38]">{back ? p.backend : p.summary}</p>
+          <div className="grid min-h-[3.6rem] grid-cols-3 gap-3 border-t border-line pt-3">
             {p.facts.map(([v, s, l], i) => <Fact key={p.id + i} value={v} suffix={s} label={l} live={live} />)}
           </div>
-          <div className="flex flex-wrap items-center justify-between gap-3">
-            <div className="flex flex-wrap gap-1.5">
+          <div className="grid h-[3.5rem] grid-cols-[minmax(0,1fr)_auto] items-start gap-3">
+            <div className="flex max-h-[3.5rem] flex-wrap gap-1.5 overflow-hidden">
               {p.tech.map((t) => <span key={t} className="label rounded-[4px] border border-line px-2 py-0.5 text-[11px] text-khaki">{t}</span>)}
             </div>
-            <div className="flex gap-4 label">
+            <div className="flex gap-4 pt-1 label">
               {p.links.live && <a className="link-ul" href={p.links.live} target="_blank" rel="noreferrer">Live ↗</a>}
               {p.links.repo && <a className="link-ul" href={p.links.repo} target="_blank" rel="noreferrer">Code ↗</a>}
             </div>
