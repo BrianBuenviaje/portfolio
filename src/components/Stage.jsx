@@ -40,7 +40,9 @@ export default function Stage({ stage, onStatus, children, className = '', snap 
     >
       <div className="mx-auto w-full max-w-[1180px]">
         <div className="stage-head mb-7 flex flex-wrap items-baseline gap-x-7 gap-y-4">
-          <span data-reveal="left" aria-hidden="true" style={{ '--i': 0, fontSize: 'clamp(26px, 7vw, 80px)', fontFamily: 'var(--font-mark)', fontWeight: 800, lineHeight: 1 }} className="text-terra">&gt;</span>
+          {/* Fredoka's chevron inks 0.675em tall against Gasoek's 0.775em caps, so it is set 15% larger to read
+              as the heading's size; at that size its centre sits within a pixel of the cap centre on the baseline. */}
+          <span data-reveal="left" aria-hidden="true" style={{ '--i': 0, fontSize: 'calc(clamp(26px, 7vw, 80px) * 1.15)', fontFamily: 'var(--font-mark)', fontWeight: 700, lineHeight: 0.85 }} className="text-terra">&gt;</span>
           <h2 data-reveal="left" style={{ '--i': 1, fontSize: 'clamp(26px, 7vw, 80px)' }} className="display">{stage.title}</h2>
           <span data-reveal="right" style={{ '--i': 2 }} className="status ml-auto inline-flex items-center gap-2 border border-line px-2.5 py-1 label text-[11.5px] text-khaki">{status}</span>
         </div>
