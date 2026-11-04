@@ -1,0 +1,150 @@
+// All copy in one place. Words come from the previous portfolio (portfolio_2), tightened.
+// Dates follow portfolio_2/src/data/experience.js; the two PDFs disagree, so confirm before launch.
+
+export const SITE = {
+  first: 'Brian',
+  last: 'Buenviaje',
+  role: 'Software engineer · Backend · Davao, PH',
+  tagline: 'I turn complex logic into clean, intuitive, high-performing digital experiences.',
+  pitch: 'Ready to make your vision come to life with high-performance web engineering, sleek architectures and interactive design.',
+  status: 'BS Computer Science at Ateneo de Davao, class of 2027. Open to developer roles and internships.',
+  github: 'https://github.com/BrianBuenviaje',            // personal account; project repos still live on the academic one
+  source: 'https://github.com/BrianBuenviaje/portfolio',
+  linkedin: 'https://www.linkedin.com/in/brianbuenviaje/',  // from Resume.pdf
+  email: 'bvadbuenviaje@addu.edu.ph',                         // from Resume.pdf (old site used a Gmail address)
+  resume: '/Resume.pdf',
+  built: 'React + Vite + Tailwind',
+}
+
+// Stages on the rail. id doubles as the anchor and the nav key.
+export const STAGES = [
+  { id: 'boot', num: '00', name: 'boot', title: 'Hello' },
+  { id: 'spec', num: '01', name: 'load', title: 'Specializations', nav: 'Skills' },
+  { id: 'build', num: '02', name: 'build', title: 'Selected work', nav: 'Work' },
+  { id: 'ship', num: '03', name: 'ship', title: 'Experience', nav: 'Experience' },
+  { id: 'contact', num: '04', name: 'contact', title: 'Commit log', nav: 'Contact' },
+]
+
+// Diagrams are laid out in a 520×150 box. Edges run from a node's right edge to the next node's left edge.
+export const PROJECTS = [
+  {
+    id: 'jebran-miki',
+    title: 'Jebran Miki',
+    year: '2025',
+    meta: 'Team of 5 · Django · DRF · React · Postgres · PayMongo',
+    headline: 'Ordering and operations for a food business',
+    summary:
+      'Customers order and track. Admins run inventory, ingredient batches with expiry, production, resupply and sales reports. I owned the Django backend: JWT roles, PayMongo checkout and its payment webhooks.',
+    tech: ['React', 'Django', 'DRF', 'PostgreSQL', 'PayMongo', 'Tailwind'],
+    facts: [
+      ['23', '', 'frontend pages'],
+      ['5.3', 'k', 'lines of backend Python'],
+      ['2', '', 'payment webhook events'],
+    ],
+    links: { repo: 'https://github.com/BVADBuenviaje/Jebran-Website-Final' },
+    image: { src: '/projects/jebran-miki-1200.webp', srcSet: '/projects/jebran-miki-640.webp 640w, /projects/jebran-miki-1200.webp 1200w', alt: 'Jebran Miki storefront and admin dashboard' },
+    diagram: {
+      nodes: [
+        { id: 'cust', label: 'customer', x: 18, y: 22 },
+        { id: 'admin', label: 'admin', x: 18, y: 92 },
+        { id: 'spa', label: 'react spa', x: 150, y: 57 },
+        { id: 'api', label: 'django api', x: 290, y: 57 },
+        { id: 'db', label: 'postgres', x: 420, y: 57 },
+        { id: 'pay', label: 'paymongo', x: 290, y: 112 },
+      ],
+      edges: [['cust', 'spa'], ['admin', 'spa'], ['spa', 'api'], ['api', 'db'], ['pay', 'api']],
+    },
+  },
+  {
+    id: 'malagos-garden',
+    title: 'Malagos Garden',
+    year: '2025',
+    meta: 'Solo · Live client site · HTML · CSS · JavaScript',
+    headline: 'The resort’s website, rebuilt from the ground up',
+    summary:
+      'A frontend reimagining of the official Malagos Garden Resort site in Davao City. Hand-built with HTML, CSS and vanilla JavaScript into a responsive, feature-rich experience that works on every device.',
+    tech: ['HTML', 'CSS', 'JavaScript', 'Vercel'],
+    facts: [
+      ['1', '', 'live client'],
+      ['0', '', 'frameworks'],
+      ['100', '%', 'hand-written'],
+    ],
+    links: { live: 'https://malagos-garden-project.vercel.app/', repo: 'https://github.com/BVADBuenviaje/MalagosGardenProject' },
+    image: { src: '/projects/malagos-garden-1200.webp', srcSet: '/projects/malagos-garden-640.webp 640w, /projects/malagos-garden-1200.webp 1200w', alt: 'Malagos Garden Resort website' },
+    diagram: {
+      nodes: [
+        { id: 'visitor', label: 'visitor', x: 18, y: 57 },
+        { id: 'edge', label: 'vercel edge', x: 150, y: 57 },
+        { id: 'site', label: 'static site', x: 290, y: 57 },
+        { id: 'pages', label: 'resort pages', x: 420, y: 22 },
+        { id: 'book', label: 'booking links', x: 420, y: 92 },
+      ],
+      edges: [['visitor', 'edge'], ['edge', 'site'], ['site', 'pages'], ['site', 'book']],
+    },
+  },
+  {
+    id: 'keystroke-auth',
+    title: 'Keystroke Auth',
+    year: '2024',
+    meta: 'Solo · Python · Behavioral biometrics · Statistics',
+    headline: 'Passwords that also check how you type',
+    summary:
+      'A Python desktop app that hardens login with behavioral biometrics. It captures microsecond variations in typing rhythm, key dwell and flight times, and scores them against a baseline profile, blocking impostors even when they know the password.',
+    tech: ['Python', 'Biometrics', 'Statistics'],
+    facts: [
+      ['2', '', 'timing signals: dwell, flight'],
+      ['1', '', 'baseline profile per user'],
+      ['µs', '', 'resolution'],
+    ],
+    links: { repo: 'https://github.com/BVADBuenviaje/keystroke-auth' },
+    image: { src: '/projects/keystroke-auth-640.webp', srcSet: '/projects/keystroke-auth-640.webp 640w', alt: 'Keystroke Auth desktop app' },
+    diagram: {
+      nodes: [
+        { id: 'keys', label: 'keystrokes', x: 18, y: 57 },
+        { id: 'timing', label: 'dwell + flight', x: 150, y: 57 },
+        { id: 'stats', label: 'feature stats', x: 290, y: 57 },
+        { id: 'profile', label: 'baseline', x: 420, y: 22 },
+        { id: 'verdict', label: 'accept / block', x: 420, y: 92 },
+      ],
+      edges: [['keys', 'timing'], ['timing', 'stats'], ['stats', 'profile'], ['stats', 'verdict']],
+    },
+  },
+]
+
+export const EXPERIENCE = [
+  {
+    id: 'hydramed',
+    when: 'Feb 2026 — May 2026',
+    org: 'HydraMed',
+    role: 'Technical intern · APEX telehealth ERP · Davao City',
+    bullets: [
+      'Supported architecture and implementation of core APEX modules.',
+      'Built across healthcare, operations and business functions end to end.',
+      'Touched EHR, CRM, financial systems, hiring and marketing tools.',
+    ],
+    certificate: { thumb: '/experiences/hydramed-certificate-thumb.webp', full: '/experiences/hydramed-certificate-full.webp', alt: 'HydraMed certificate of training completion, 180 hours' },
+  },
+  {
+    id: 'ccna',
+    when: 'Dec 2025 — Apr 2026',
+    org: 'Cisco Networking Academy · Ateneo de Davao',
+    role: 'CCNA: Introduction to Networks',
+    bullets: [
+      'Network architecture, IP addressing and device communication.',
+      'Basic device configuration and core connectivity concepts.',
+    ],
+    certificate: { thumb: '/experiences/ccna-certificate-thumb.webp', full: '/experiences/ccna-certificate-full.webp', alt: 'Cisco Networking Academy certificate, CCNA: Introduction to Networks' },
+  },
+  {
+    id: 'webdiner',
+    when: 'Nov 2025 — Jan 2026',
+    org: 'WebDiner LLC',
+    role: 'Website design intern · Remote',
+    bullets: [
+      'Built responsive interfaces and turned client requirements into features.',
+      'Optimized performance and SEO structure for live deployments.',
+      'Helped ship production-ready websites to real clients.',
+    ],
+    certificate: { thumb: '/experiences/webdiner-certificate-thumb.webp', full: '/experiences/webdiner-certificate-full.webp', alt: 'WebDiner LLC certificate of completion, Website Design Intern' },
+  },
+]
