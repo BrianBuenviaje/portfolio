@@ -18,13 +18,13 @@ export const SITE = {
   built: 'React + Vite + Tailwind',
 }
 
-// Stages on the rail. id doubles as the anchor and the nav key.
+// Stages on the rail. id doubles as the anchor and the nav key; each heading is led by a '>' mark.
 export const STAGES = [
-  { id: 'boot', num: '00', name: 'boot', title: 'Hello' },
-  { id: 'spec', num: '01', name: 'load', title: 'Specializations', nav: 'Skills' },
-  { id: 'build', num: '02', name: 'build', title: 'Selected work', nav: 'Work' },
-  { id: 'ship', num: '03', name: 'ship', title: 'Experience', nav: 'Experience' },
-  { id: 'contact', num: '04', name: 'contact', title: 'Commit log', nav: 'Contact' },
+  { id: 'boot', title: 'Hello' },
+  { id: 'spec', title: 'Specializations', nav: 'Skills' },
+  { id: 'build', title: 'Selected work', nav: 'Work' },
+  { id: 'ship', title: 'Experience', nav: 'Experience' },
+  { id: 'contact', title: 'Commit log', nav: 'Contact' },
 ]
 
 // Diagrams are laid out in a 520×150 box. Edges run from a node's right edge to the next node's left edge.
