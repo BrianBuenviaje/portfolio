@@ -9,7 +9,14 @@ export default function Nav({ active }) {
   const reduce = useReducedMotion()
   const [hidden, setHidden] = useState(false)
   const [open, setOpen] = useState(false)
+  const [covered, setCovered] = useState(false)   // a picture is open full screen
   const lastY = useRef(0)
+
+  useEffect(() => {
+    const onLightbox = (e) => { setCovered(!!e.detail); if (e.detail) setOpen(false) }
+    document.addEventListener('lightbox', onLightbox)
+    return () => document.removeEventListener('lightbox', onLightbox)
+  }, [])
 
   useEffect(() => {
     let ticking = false
@@ -51,7 +58,8 @@ export default function Nav({ active }) {
     <nav
       aria-label="Site"
       className="fixed inset-x-0 top-0 z-30 bg-field text-ink-deep transition-transform duration-300 ease-out"
-      style={{ transform: hidden && !open ? 'translateY(-110%)' : 'translateY(0)' }}
+      style={{ transform: covered || (hidden && !open) ? 'translateY(-110%)' : 'translateY(0)' }}
+      aria-hidden={covered || undefined}
     >
       <div className="gutter" style={{ paddingTop: 'calc(env(safe-area-inset-top, 0px) + 6px)', paddingBottom: '6px' }}>
         <div className="mx-auto flex max-w-[1180px] items-center justify-between gap-3 label">

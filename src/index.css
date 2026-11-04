@@ -37,6 +37,14 @@
   }
   ::selection { background: var(--color-terra); color: #fff; }
   :focus-visible { outline: 2px solid var(--color-terra); outline-offset: 3px; }
+
+  /* Scrollbars: thin, no track, a quiet beige thumb that warms up on hover. */
+  * { scrollbar-width: thin; scrollbar-color: rgb(230 217 188 / .35) transparent; }
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: rgb(230 217 188 / .35); border-radius: 999px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--color-terra); }
+  ::-webkit-scrollbar-corner { background: transparent; }
 }
 
 @utility gutter {

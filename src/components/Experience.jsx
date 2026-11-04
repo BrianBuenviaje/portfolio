@@ -1,15 +1,9 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { EXPERIENCE } from '../data/content.js'
+import Lightbox from './Lightbox.jsx'
 
 export default function Experience() {
   const [open, setOpen] = useState(null)
-
-  useEffect(() => {
-    if (!open) return
-    const onKey = (e) => { if (e.key === 'Escape') setOpen(null) }
-    window.addEventListener('keydown', onKey)
-    return () => window.removeEventListener('keydown', onKey)
-  }, [open])
 
   return (
     <>
@@ -39,18 +33,7 @@ export default function Experience() {
         ))}
       </div>
 
-      {open && (
-        <div
-          role="dialog"
-          aria-modal="true"
-          aria-label={open.certificate.alt}
-          className="fixed inset-0 z-40 grid place-items-center bg-ground/90 p-4"
-          onClick={() => setOpen(null)}
-        >
-          <img src={open.certificate.full} alt={open.certificate.alt} className="max-h-[90vh] max-w-full rounded-[4px] border border-line" />
-          <button type="button" className="btn-paint absolute right-4 top-4" onClick={() => setOpen(null)}>Close</button>
-        </div>
-      )}
+      {open && <Lightbox src={open.certificate.full} alt={open.certificate.alt} onClose={() => setOpen(null)} />}
     </>
   )
 }

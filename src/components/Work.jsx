@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { PROJECTS } from '../data/content.js'
+import Lightbox from './Lightbox.jsx'
 
 const NODE_W = 100, NODE_H = 36
 
@@ -72,6 +73,7 @@ export default function Work({ live }) {
   const [tab, setTab] = useState('front')
   const [shown, setShown] = useState({ index: 0, tab: 'front' })
   const [fading, setFading] = useState(false)
+  const [zoom, setZoom] = useState(false)
   const timer = useRef(null)
 
   const swap = (next) => {
@@ -133,16 +135,19 @@ export default function Work({ live }) {
             {back ? (
               <div className="flex h-full w-full items-center px-3"><Diagram diagram={p.diagram} title={p.title} /></div>
             ) : (
-              <img
-                src={p.image.src}
-                srcSet={p.image.srcSet}
-                sizes="(min-width: 1024px) 480px, 90vw"
-                alt={p.image.alt}
-                loading="lazy"
-                className="block h-full w-full object-cover object-top"
-              />
+              <button type="button" onClick={() => setZoom(true)} className="group block h-full w-full cursor-zoom-in" aria-label={`Enlarge: ${p.image.alt}`}>
+                <img
+                  src={p.image.src}
+                  srcSet={p.image.srcSet}
+                  sizes="(min-width: 1024px) 480px, 90vw"
+                  alt={p.image.alt}
+                  loading="lazy"
+                  className="block h-full w-full object-cover object-top transition-transform duration-500 group-hover:scale-[1.03]"
+                />
+              </button>
             )}
           </div>
+          {zoom && <Lightbox src={p.image.src} alt={p.image.alt} onClose={() => setZoom(false)} />}
           <p className="line-clamp-5 min-h-[6.9em] max-w-[52ch] text-[14px] leading-[1.38]">{back ? p.backend : p.summary}</p>
           <div className="grid min-h-[3.6rem] grid-cols-3 gap-3 border-t border-line pt-3">
             {p.facts.map(([v, s, l], i) => <Fact key={p.id + i} value={v} suffix={s} label={l} live={live} />)}
