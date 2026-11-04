@@ -43,7 +43,7 @@ export default function App() {
   const railRef = useRef(null)
   const [statuses, setStatuses] = useState({})
   const [fill, setFill] = useState(0)
-  const [active, setActive] = useState(null)
+  const [active, setActive] = useState('home')
   const els = useRef({})
   useReveal()
 
@@ -70,7 +70,8 @@ export default function App() {
   // Nav highlight follows the section nearest the middle of the screen.
   useEffect(() => {
     const spy = new IntersectionObserver(
-      (entries) => entries.forEach((e) => { if (e.isIntersecting) setActive(e.target.id === 'top' ? null : e.target.id) }),
+      // The hero and the Hello stage under it both count as Home.
+      (entries) => entries.forEach((e) => { if (e.isIntersecting) setActive(e.target.id === 'top' || e.target.id === 'boot' ? 'home' : e.target.id) }),
       { rootMargin: '-35% 0px -55% 0px' },
     )
     ;['top', ...STAGES.map((s) => s.id)].forEach((id) => { const el = document.getElementById(id); if (el) spy.observe(el) })

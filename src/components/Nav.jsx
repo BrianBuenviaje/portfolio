@@ -2,14 +2,17 @@ import { useEffect, useRef, useState } from 'react'
 import { SITE, STAGES } from '../data/content.js'
 import { scrollToId, useReducedMotion } from '../lib/util.js'
 
-// Fixed top bar. Hides when you scroll down, slides back when you scroll up, always shown at the top of
-// the page. The section in view gets a terracotta pill with white text. Below the md breakpoint the links
-// live behind a hamburger that unfolds them in a stack.
+// Fixed top bar: name on the left, section links centred, Résumé on the right. Hides when you scroll
+// down, slides back when you scroll up, always shown at the top of the page, and steps aside while a
+// picture is open full screen. The section in view gets a terracotta pill with white text; Home is lit on
+// the hero. Below the md breakpoint the links live behind a hamburger that unfolds them in a stack.
+const HOME = { id: 'home', nav: 'Home' }
+
 export default function Nav({ active }) {
   const reduce = useReducedMotion()
   const [hidden, setHidden] = useState(false)
   const [open, setOpen] = useState(false)
-  const [covered, setCovered] = useState(false)   // a picture is open full screen
+  const [covered, setCovered] = useState(false)
   const lastY = useRef(0)
 
   useEffect(() => {
@@ -47,11 +50,12 @@ export default function Nav({ active }) {
   const go = (e, id) => {
     e.preventDefault()
     setOpen(false)
+    if (id === 'home') { window.scrollTo({ top: 0, behavior: reduce ? 'auto' : 'smooth' }); return }
     // A jump past Specializations must not get caught by its scroll hold.
     if (STAGES.findIndex((s) => s.id === id) > specIndex) document.dispatchEvent(new Event('spec:release'))
     scrollToId(id, reduce)
   }
-  const links = STAGES.filter((s) => s.nav)
+  const links = [HOME, ...STAGES.filter((s) => s.nav)]
   const pill = (on) => 'rounded-full whitespace-nowrap transition-colors duration-200 ' + (on ? 'bg-terra text-white' : 'hover:bg-ink-deep/10')
 
   return (
@@ -62,26 +66,22 @@ export default function Nav({ active }) {
       aria-hidden={covered || undefined}
     >
       <div className="gutter" style={{ paddingTop: 'calc(env(safe-area-inset-top, 0px) + 6px)', paddingBottom: '6px' }}>
-        <div className="mx-auto flex max-w-[1180px] items-center justify-between gap-3 label">
-          <a
-            href="#top"
-            onClick={(e) => { e.preventDefault(); setOpen(false); window.scrollTo({ top: 0, behavior: reduce ? 'auto' : 'smooth' }) }}
-            className="link-ul py-2"
-            aria-label="Back to top"
-          >
+        <div className="mx-auto grid max-w-[1180px] grid-cols-[1fr_auto] items-center gap-3 label md:grid-cols-[1fr_auto_1fr]">
+          <a href="#top" onClick={(e) => go(e, 'home')} className="link-ul justify-self-start py-2" aria-label="Back to top">
             {SITE.first} {SITE.last}
           </a>
 
-          <div className="hidden gap-1 md:flex">
+          <div className="hidden justify-self-center gap-1 md:flex">
             {links.map((s) => (
-              <a key={s.id} href={`#${s.id}`} onClick={(e) => go(e, s.id)} aria-current={active === s.id ? 'true' : undefined} className={`px-3 py-1.5 ${pill(active === s.id)}`}>{s.nav}</a>
+              <a key={s.id} href={s.id === 'home' ? '#top' : `#${s.id}`} onClick={(e) => go(e, s.id)} aria-current={active === s.id ? 'true' : undefined} className={`px-3 py-1.5 ${pill(active === s.id)}`}>{s.nav}</a>
             ))}
-            <a href={SITE.resume} target="_blank" rel="noreferrer" className={`px-3 py-1.5 ${pill(false)}`}>Résumé ↗</a>
           </div>
+
+          <a href={SITE.resume} target="_blank" rel="noreferrer" className={`hidden justify-self-end px-3 py-1.5 md:inline-block ${pill(false)}`}>Résumé ↗</a>
 
           <button
             type="button"
-            className={`burger md:hidden ${open ? 'open' : ''}`}
+            className={`burger justify-self-end md:hidden ${open ? 'open' : ''}`}
             aria-expanded={open}
             aria-controls="site-menu"
             aria-label={open ? 'Close menu' : 'Open menu'}
@@ -98,7 +98,7 @@ export default function Nav({ active }) {
             {links.map((s, i) => (
               <a
                 key={s.id}
-                href={`#${s.id}`}
+                href={s.id === 'home' ? '#top' : `#${s.id}`}
                 onClick={(e) => go(e, s.id)}
                 tabIndex={open ? 0 : -1}
                 aria-current={active === s.id ? 'true' : undefined}
