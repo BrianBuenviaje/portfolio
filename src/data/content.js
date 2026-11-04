@@ -12,6 +12,8 @@ export const SITE = {
   source: 'https://github.com/BrianBuenviaje/portfolio',
   linkedin: 'https://www.linkedin.com/in/brianbuenviaje/',  // from Resume.pdf
   email: 'bvadbuenviaje@addu.edu.ph',                         // from Resume.pdf (old site used a Gmail address)
+  facebook: 'https://www.facebook.com/share/14YQTLADq47/',   // from the older portfolio; replace with the profile URL when handy
+  instagram: '',                                               // TODO(owner): add profile URL; the icon shows once this is filled
   resume: '/Resume.pdf',
   built: 'React + Vite + Tailwind',
 }
