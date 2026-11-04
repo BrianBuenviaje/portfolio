@@ -22,7 +22,7 @@ export const SITE = {
 export const STAGES = [
   { id: 'boot', title: 'Hello' },
   { id: 'spec', title: 'Specializations', nav: 'Skills' },
-  { id: 'build', title: 'Selected work', nav: 'Work' },
+  { id: 'build', title: 'Projects', nav: 'Projects' },
   { id: 'ship', title: 'Experience', nav: 'Experience' },
   { id: 'contact', title: 'Commit log', nav: 'Contact' },
 ]
@@ -31,9 +31,9 @@ export const STAGES = [
 export const PROJECTS = [
   {
     id: 'jebran-miki',
+    deployed: false,
     title: 'Jebran Miki',
     year: '2025',
-    meta: 'Team of 5 · Django · DRF · React · Postgres · PayMongo',
     headline: 'Ordering and operations for a food business',
     summary:
       'Customers order and track. Admins run inventory, ingredient batches with expiry, production, resupply and sales reports. I owned the Django backend: JWT roles, PayMongo checkout and its payment webhooks.',
@@ -41,11 +41,6 @@ export const PROJECTS = [
     backend:
       'A React app talks to a Django REST Framework API. JWT tokens carry one of three roles: customer, admin, supplier. PayMongo handles checkout and calls back a webhook that marks orders paid or refunded. Postgres holds products, orders, ingredient batches with expiry dates and restock levels.',
     tech: ['React', 'Django', 'DRF', 'PostgreSQL', 'PayMongo', 'Tailwind'],
-    facts: [
-      ['23', '', 'frontend pages'],
-      ['5.3', 'k', 'lines of backend Python'],
-      ['2', '', 'payment webhook events'],
-    ],
     links: { repo: 'https://github.com/BVADBuenviaje/Jebran-Website-Final' },
     image: { src: '/projects/jebran-miki-1200.webp', srcSet: '/projects/jebran-miki-640.webp 640w, /projects/jebran-miki-1200.webp 1200w', alt: 'Jebran Miki storefront and admin dashboard' },
     diagram: {
@@ -62,9 +57,9 @@ export const PROJECTS = [
   },
   {
     id: 'malagos-garden',
+    deployed: true,
     title: 'Malagos Garden',
     year: '2025',
-    meta: 'Solo · Live client site · HTML · CSS · JavaScript',
     headline: 'The resort’s website, rebuilt from the ground up',
     summary:
       'A frontend reimagining of the official Malagos Garden Resort site in Davao City. Hand-built with HTML, CSS and vanilla JavaScript into a responsive, feature-rich experience that works on every device.',
@@ -72,11 +67,6 @@ export const PROJECTS = [
     backend:
       'Deliberately serverless. Every page is static HTML, CSS and JavaScript served from Vercel’s edge network, so there is nothing to patch, scale or pay for. Booking and enquiries hand off to the resort’s existing channels by link.',
     tech: ['HTML', 'CSS', 'JavaScript', 'Vercel'],
-    facts: [
-      ['1', '', 'live client'],
-      ['0', '', 'frameworks'],
-      ['100', '%', 'hand-written'],
-    ],
     links: { live: 'https://malagos-garden-project.vercel.app/', repo: 'https://github.com/BVADBuenviaje/MalagosGardenProject' },
     image: { src: '/projects/malagos-garden-1200.webp', srcSet: '/projects/malagos-garden-640.webp 640w, /projects/malagos-garden-1200.webp 1200w', alt: 'Malagos Garden Resort website' },
     diagram: {
@@ -92,9 +82,9 @@ export const PROJECTS = [
   },
   {
     id: 'soil-states',
+    deployed: false,
     title: 'Soil States',
     year: '2026',
-    meta: 'Solo · Thesis · Python · scikit-learn · IoT sensors',
     headline: 'Soil condition states from cheap sensors, no lab labels',
     summary:
       'Undergraduate thesis. Five low-cost IoT nodes logged moisture, pH and temperature for a month. The pipeline finds four recurring soil states without laboratory labels, checks them by leaving one node out, trains a Random Forest to assign new readings, and ships a phone app that turns each state into advice from a rule base.',
@@ -102,11 +92,6 @@ export const PROJECTS = [
     backend:
       'Readings are cleaned and turned into per-node features. Clustering on the training month finds the states; a leave-one-node-out check confirms they are not just the sensor locations. A tuned Random Forest assigns states to the test week at 93% accuracy. A threshold-based expert system maps states to eight irrigation and nutrient rules the monitor app shows.',
     tech: ['Python', 'scikit-learn', 'pandas', 'Random Forest', 'Expert system', 'PWA'],
-    facts: [
-      ['3029', '', 'sensor readings, 5 nodes'],
-      ['4', '', 'soil states found'],
-      ['93.1', '%', 'test-week accuracy'],
-    ],
     links: { repo: 'https://github.com/BVADBuenviaje/soil_condition_states' },
     image: { src: '/projects/soil-states-1200.webp', srcSet: '/projects/soil-states-640.webp 640w, /projects/soil-states-1200.webp 1200w', alt: 'Soil Condition Monitor app: nodes, advice and past-week views' },
     diagram: {
@@ -122,9 +107,9 @@ export const PROJECTS = [
   },
   {
     id: 'medpal',
+    deployed: true,
     title: 'MedPal',
     year: '2026',
-    meta: 'Team of 5 · Next.js · Supabase · AWS Textract · Comprehend Medical · Bedrock',
     headline: 'Reads a prescription from a photo and explains it in Bisaya',
     summary:
       'A mobile-first PWA for patients. Photograph a prescription or lab result; the app reads it, pulls out the medicines, checks interactions and explains them in Bisaya, Filipino or English, with reminders and a chat for follow-up questions. I built the core API endpoints and fixed the mobile layouts.',
@@ -132,11 +117,6 @@ export const PROJECTS = [
     backend:
       'Next.js route handlers take the photo and hand it to AWS Textract for text, then Comprehend Medical to pull out medicines at a confidence floor, then Bedrock to explain interactions in the chosen language. Supabase handles sign-in, records and reminders. Without AWS keys the chain falls back to mock responses so the app still runs locally.',
     tech: ['Next.js', 'TypeScript', 'Supabase', 'AWS Textract', 'Comprehend Medical', 'Bedrock', 'Tailwind'],
-    facts: [
-      ['3', '', 'AWS services chained'],
-      ['3', '', 'languages'],
-      ['7', '', 'API routes'],
-    ],
     links: { repo: 'https://github.com/KeyBIND-AWS/medpal' },
     image: { src: '/projects/medpal-1200.webp', srcSet: '/projects/medpal-640.webp 640w, /projects/medpal-1200.webp 1200w', alt: 'MedPal app screens' },
     diagram: {
@@ -152,10 +132,35 @@ export const PROJECTS = [
     },
   },
   {
+    id: 'masquerade',
+    deployed: true,
+    title: 'Masquerade',
+    year: '2026',
+    headline: 'A party game of impostors, played from a room code',
+    summary:
+      'A real-time social deduction game built as a PWA. Friends join a private room; everyone but the impostors gets the same secret word, and the impostors have to bluff their way through the clues and the vote. When nobody is around, Gemini-powered bots fill the seats: they read the clue log, blend in and vote.',
+    backendHeadline: 'Server-authoritative rooms over Socket.IO',
+    backend:
+      'Roles, secret words, timers and phases all live on the Express and Socket.IO server; a client only ever receives what its role may see, so there is nothing to cheat with. Bots join as ordinary socket clients and reason with Gemini 2.5 Flash. One shared TypeScript package keeps the client, server and bot workspaces on the same types.',
+    tech: ['React', 'TypeScript', 'Socket.IO', 'Express', 'Zustand', 'Gemini', 'PWA'],
+    links: { repo: 'https://github.com/BVADBuenviaje/masquerade' },
+    image: { src: '/projects/masquerade-1200.webp', srcSet: '/projects/masquerade-640.webp 640w, /projects/masquerade-1200.webp 1200w', alt: 'Masquerade game screens' },
+    diagram: {
+      nodes: [
+        { id: 'pwa', label: 'react pwa', x: 18, y: 22 },
+        { id: 'bot', label: 'bot clients', x: 18, y: 92 },
+        { id: 'io', label: 'socket.io', x: 150, y: 57 },
+        { id: 'eng', label: 'game engine', x: 290, y: 57 },
+        { id: 'llm', label: 'gemini 2.5', x: 290, y: 110 },
+      ],
+      edges: [['pwa', 'io'], ['bot', 'io'], ['io', 'eng'], ['bot', 'llm']],
+    },
+  },
+  {
     id: 'keystroke-auth',
+    deployed: false,
     title: 'Keystroke Auth',
     year: '2024',
-    meta: 'Solo · Python · Behavioral biometrics · Statistics',
     headline: 'Passwords that also check how you type',
     summary:
       'A Python desktop app that hardens login with behavioral biometrics. It captures microsecond variations in typing rhythm, key dwell and flight times, and scores them against a baseline profile, blocking impostors even when they know the password.',
@@ -163,11 +168,6 @@ export const PROJECTS = [
     backend:
       'Key events are timestamped as they arrive. Dwell (how long a key is held) and flight (the gap between keys) become per-user feature statistics. A login attempt is scored against the stored baseline profile and accepted or blocked on the distance, so the password alone is never enough.',
     tech: ['Python', 'Biometrics', 'Statistics'],
-    facts: [
-      ['2', '', 'timing signals: dwell, flight'],
-      ['1', '', 'baseline profile per user'],
-      ['µs', '', 'resolution'],
-    ],
     links: { repo: 'https://github.com/BVADBuenviaje/keystroke-auth' },
     image: { src: '/projects/keystroke-auth-640.webp', srcSet: '/projects/keystroke-auth-640.webp 640w', alt: 'Keystroke Auth desktop app' },
     diagram: {

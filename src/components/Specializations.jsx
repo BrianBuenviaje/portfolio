@@ -51,11 +51,11 @@ function useLayout(ref) {
     const el = ref.current
     if (!el) return
     const measure = () => {
-      const w = el.clientWidth, short = window.innerHeight < 520
-      // Narrow screens get small cells (three across); short ones get mid cells so five fit in a row and
-      // the grid stays two rows tall.
-      const cell = w < 560 ? 84 : (short ? Math.max(84, Math.min(112, Math.floor((w - 56) / 5))) : 150)
-      const k = Math.max(2, Math.min(5, Math.floor((w - cell / 2) / cell)))
+      const w = el.clientWidth, short = window.innerHeight < 520, phone = w < 560
+      // Phones always get three rows of three (the middle row sits in the gaps of the other two), with the
+      // cell sized so a row plus its half-cell offset fits; short screens get mid cells so five fit in a row.
+      const cell = phone ? Math.min(84, Math.floor(w / 3.5)) : (short ? Math.max(84, Math.min(112, Math.floor((w - 56) / 5))) : 150)
+      const k = phone ? 3 : Math.max(2, Math.min(5, Math.floor((w - cell / 2) / cell)))
       const rows = Math.ceil(N / k)
       const section = el.closest('section'), head = section?.querySelector('.stage-head')
       // Room for the rings is what the screen leaves after the stage's padding, heading and the scroll

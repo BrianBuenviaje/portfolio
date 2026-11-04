@@ -207,9 +207,22 @@
 .proj:hover, .proj.active { padding-left: 18px; }
 .proj:hover::before, .proj.active::before { width: 4px; }
 
-/* Panel content cross-fades when the project changes. */
-.panel-body { transition: opacity .28s ease, transform .28s var(--ease-out-soft); }
+/* Panel content cross-fades when the project changes; below lg its height glides to the new content too. */
+.panel-body { transition: opacity .28s ease, transform .28s var(--ease-out-soft), height .38s var(--ease-out-soft); }
 .panel-body.fading { opacity: 0; transform: translateY(6px); }
+
+/* Projects as an accordion below lg: the other rows fold away while the card opens under the pressed one. */
+.acc-row { display: grid; grid-template-rows: 1fr; transition: grid-template-rows .45s var(--ease-out-soft), opacity .3s ease; }
+.acc-row > div, .acc-panel > div { min-height: 0; overflow: hidden; }
+.acc-row.folded { grid-template-rows: 0fr; opacity: 0; }
+.acc-panel { display: grid; grid-template-rows: 0fr; transition: grid-template-rows .45s var(--ease-out-soft); }
+.acc-panel.open { grid-template-rows: 1fr; }
+.acc-panel > div > div { opacity: 0; transform: translateY(-10px); transition: opacity .25s ease, transform .4s var(--ease-out-soft); }
+.acc-panel.open > div > div { opacity: 1; transform: none; transition-delay: .1s; }
+
+/* Projects on wide screens: a window of rows that slides one row at a time; rows outside it fade. */
+.pl-stack { transition: transform .45s var(--ease-out-soft); }
+.pl-stack > div { transition: opacity .3s ease; }
 
 /* Data flow through a diagram while its stage is live. */
 .flow { fill: none; stroke: var(--color-terra); stroke-width: 1.5; stroke-dasharray: 5 6; opacity: 0; }
