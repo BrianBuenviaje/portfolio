@@ -40,7 +40,7 @@ export default function Stage({ stage, onStatus, children, className = '', snap 
     >
       <div className="mx-auto w-full max-w-[1180px]">
         <div className="stage-head mb-7 flex flex-wrap items-baseline gap-x-7 gap-y-4">
-          <span data-reveal="left" aria-hidden="true" style={{ '--i': 0, fontSize: 'clamp(26px, 7vw, 80px)' }} className="display text-terra">&gt;</span>
+          <span data-reveal="left" aria-hidden="true" style={{ '--i': 0, fontSize: 'clamp(26px, 7vw, 80px)', fontFamily: 'var(--font-mark)', fontWeight: 800, lineHeight: 1 }} className="text-terra">&gt;</span>
           <h2 data-reveal="left" style={{ '--i': 1, fontSize: 'clamp(26px, 7vw, 80px)' }} className="display">{stage.title}</h2>
           <span data-reveal="right" style={{ '--i': 2 }} className="status ml-auto inline-flex items-center gap-2 border border-line px-2.5 py-1 label text-[11.5px] text-khaki">{status}</span>
         </div>

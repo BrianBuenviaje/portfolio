@@ -19,6 +19,7 @@
   --font-display: "Gasoek One", Impact, "Arial Black", sans-serif;
   --font-sans: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
   --font-mono: "IBM Plex Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
+  --font-mark: "Baloo 2", "Arial Rounded MT Bold", "Nunito", sans-serif;   /* the ">" before stage headings */
 
   --ease-out-soft: cubic-bezier(.2, .7, .2, 1);
   --ease-stamp: cubic-bezier(.2, 1.25, .3, 1);
