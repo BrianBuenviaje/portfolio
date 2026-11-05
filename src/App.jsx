@@ -85,8 +85,7 @@ export default function App() {
           <Stage stage={byId.spec} className="[&::before]:top-[calc(50%-6px)]"><Specializations /></Stage>
           <Stage stage={byId.build}><Work /></Stage>
           <Stage stage={byId.ship}><Experience /></Stage>
-          <Stage stage={byId.contact}><Contact /></Stage>
-          <Footer />
+          <Stage stage={byId.contact} after={<Footer />}><Contact /></Stage>
         </div>
       </div>
     </>

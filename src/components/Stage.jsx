@@ -4,7 +4,9 @@ import { useReducedMotion } from '../lib/util.js'
 // One stage on the rail. Flips queued → running → done the first time it enters the viewport and reports
 // that upward so the rail can fill. Entrance and exit motion of its content is handled per element by the
 // reveal observer in App (anything marked data-reveal).
-export default function Stage({ stage, onStatus, children, className = '', snap = true }) {
+// `after` is rendered at the foot of the stage (the footer under the commit log), with the content
+// centred in the room above it.
+export default function Stage({ stage, onStatus, children, after = null, className = '', snap = true }) {
   const ref = useRef(null)
   const reduce = useReducedMotion()
   const [status, setStatus] = useState('queued')
@@ -38,7 +40,7 @@ export default function Stage({ stage, onStatus, children, className = '', snap 
       className={`stage ${snap ? 'snap' : ''} relative flex min-h-[100svh] flex-col justify-center border-t border-line py-14 lg:py-20 ${status} ${className}`}
       style={{ paddingLeft: 'calc(max(16px, env(safe-area-inset-left, 0px)) + 40px)', paddingRight: 'max(16px, env(safe-area-inset-right, 0px))' }}
     >
-      <div className="mx-auto w-full max-w-[1180px]">
+      <div className={`mx-auto w-full max-w-[1180px] ${after ? 'my-auto' : ''}`}>
         <div className="stage-head mb-7 flex flex-wrap items-baseline gap-x-7 gap-y-4">
           {/* Fredoka's chevron inks 0.675em tall against Gasoek's 0.775em caps, so it is set 15% larger to read
               as the heading's size; at that size its centre sits within a pixel of the cap centre on the baseline. */}
@@ -47,6 +49,7 @@ export default function Stage({ stage, onStatus, children, className = '', snap 
         </div>
         {children}
       </div>
+      {after}
     </section>
   )
 }

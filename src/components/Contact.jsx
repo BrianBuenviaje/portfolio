@@ -30,22 +30,39 @@ export default function Contact() {
     try { await navigator.clipboard.writeText(SITE.email); setCopied(true); setTimeout(() => setCopied(false), 1500) } catch { /* fallback below */ }
   }
 
+  const links = [
+    ['GitHub', SITE.github],
+    SITE.linkedin && ['LinkedIn', SITE.linkedin],
+    ['Résumé', SITE.resume],
+  ].filter(Boolean)
+
   return (
     <div>
       <p data-reveal="left" style={{ '--i': 3 }} className="label text-khaki">Say hi</p>
-      <p data-reveal="left" style={{ '--i': 4, fontSize: 'clamp(20px, 3.6vw, 44px)' }} className="display mt-2 flex flex-wrap items-center gap-4 break-all">
-        {SITE.email || 'email coming soon'}
-        {SITE.email && (
-          <button type="button" onClick={copy} className="btn-paint text-[12px]" style={{ padding: '6px 10px' }}>{copied ? 'Copied' : 'Copy'}</button>
-        )}
-      </p>
-      <div data-reveal style={{ '--i': 5 }} className="mt-5 flex flex-wrap gap-5 label">
-        <a className="link-ul" href={SITE.github} target="_blank" rel="noreferrer">GitHub ↗</a>
-        {SITE.linkedin && <a className="link-ul" href={SITE.linkedin} target="_blank" rel="noreferrer">LinkedIn ↗</a>}
-        <a className="link-ul" href={SITE.resume} target="_blank" rel="noreferrer">Résumé ↗</a>
+      {/* The address: from md up the big display line with its Copy button beside it; below md a boxed
+          line with the button on its end, so it never breaks mid-word. */}
+      <div data-reveal="left" style={{ '--i': 4 }} className="mt-2">
+        <p className="display hidden flex-wrap items-center gap-4 break-all md:flex" style={{ fontSize: 'clamp(20px, 3.6vw, 44px)' }}>
+          {SITE.email || 'email coming soon'}
+          {SITE.email && (
+            <button type="button" onClick={copy} className="btn-paint text-[12px]" style={{ padding: '6px 10px' }}>{copied ? 'Copied' : 'Copy'}</button>
+          )}
+        </p>
+        <div className="flex items-stretch rounded-[4px] border border-line md:hidden">
+          <span className="min-w-0 flex-1 truncate px-3 py-2.5 font-mono text-[13.5px]">{SITE.email || 'email coming soon'}</span>
+          {SITE.email && (
+            <button type="button" onClick={copy} className="label cursor-pointer rounded-r-[3px] bg-terra px-3.5 text-[11px] text-white transition-colors active:bg-terra-soft">{copied ? 'Copied' : 'Copy'}</button>
+          )}
+        </div>
+      </div>
+      {/* Links: pills below md (room for a thumb), plain underlined links from md up. */}
+      <div data-reveal style={{ '--i': 5 }} className="mt-4 flex flex-wrap gap-2 label md:mt-5 md:gap-5">
+        {links.map(([label, href]) => (
+          <a key={label} className="link-ul rounded-full border border-line px-3 py-1.5 md:rounded-none md:border-0 md:px-0 md:py-0" href={href} target="_blank" rel="noreferrer">{label} ↗</a>
+        ))}
       </div>
 
-      <div data-reveal="scale" style={{ '--i': 6 }} className="mt-8 border-t border-ink font-mono text-[13px]">
+      <div data-reveal="scale" style={{ '--i': 6 }} className="mt-7 border-t border-ink font-mono text-[13px] md:mt-8">
         {log.length === 0 && <p className="py-3 text-khaki">No commits yet. Leave the first one.</p>}
         {log.map((e) => (
           <div key={e.hash + e.at} className="grid grid-cols-[72px_minmax(0,1fr)] gap-x-4 border-b border-line py-2.5 md:grid-cols-[72px_minmax(0,1fr)_auto]">
