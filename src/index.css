@@ -161,10 +161,10 @@
 /* ── Specializations: logos drawn one at a time as you scroll ───────────── */
 /* Dash array and the hidden offset are set per element in script (--off = length + a little), so the
    round tip of a stroke never shows before its logo is live. */
-.spec-logo .ring { stroke-dashoffset: var(--off, 400); transition: stroke-dashoffset .8s var(--ease-out-soft); }
-.spec-logo .draw { stroke-dashoffset: var(--off, 300); fill-opacity: 0; transition: stroke-dashoffset .9s var(--ease-out-soft) .25s, fill-opacity .5s ease 1s; }
-.spec-logo .txt { fill-opacity: 0; transition: fill-opacity .5s ease .9s; }
-.spec-logo .name { opacity: 0; transform: translateY(8px); transition: opacity .4s ease .9s, transform .4s var(--ease-out-soft) .9s; }
+.spec-logo .ring { stroke-dashoffset: var(--off, 400); transition: stroke-dashoffset .55s var(--ease-out-soft); }
+.spec-logo .draw { stroke-dashoffset: var(--off, 300); fill-opacity: 0; transition: stroke-dashoffset .7s var(--ease-out-soft) .15s, fill-opacity .4s ease .55s; }
+.spec-logo .txt { fill-opacity: 0; transition: fill-opacity .4s ease .5s; }
+.spec-logo .name { opacity: 0; transform: translateY(8px); transition: opacity .35s ease .5s, transform .35s var(--ease-out-soft) .5s; }
 .spec-logo.on .ring { stroke-dashoffset: 0; }
 .spec-logo.on .draw { stroke-dashoffset: 0; fill-opacity: .18; }
 .spec-logo.on .draw.solid { fill-opacity: 1; }

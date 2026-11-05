@@ -35,7 +35,7 @@ export default function Stage({ stage, onStatus, children, className = '', snap 
       id={stage.id}
       ref={ref}
       data-stage={stage.id}
-      className={`stage ${snap ? 'snap' : ''} relative flex min-h-[100svh] flex-col justify-center border-t border-line py-20 ${status} ${className}`}
+      className={`stage ${snap ? 'snap' : ''} relative flex min-h-[100svh] flex-col justify-center border-t border-line py-14 lg:py-20 ${status} ${className}`}
       style={{ paddingLeft: 'calc(max(16px, env(safe-area-inset-left, 0px)) + 40px)', paddingRight: 'max(16px, env(safe-area-inset-right, 0px))' }}
     >
       <div className="mx-auto w-full max-w-[1180px]">

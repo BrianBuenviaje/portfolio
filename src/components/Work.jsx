@@ -1,6 +1,6 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { PROJECTS } from '../data/content.js'
-import { useMediaQuery } from '../lib/util.js'
+import { useMediaQuery, useReducedMotion } from '../lib/util.js'
 import Lightbox from './Lightbox.jsx'
 
 const NODE_W = 100, NODE_H = 36
@@ -71,7 +71,7 @@ function Row({ proj, active, expanded, onClick, className = '' }) {
       aria-selected={active}
       aria-expanded={expanded}
       onClick={onClick}
-      className={`proj relative flex w-full cursor-pointer items-center border-b border-line py-5 text-left ${active ? 'active' : ''} ${className}`}
+      className={`proj relative flex w-full cursor-pointer items-center border-b border-line py-4 text-left lg:py-5 ${active ? 'active' : ''} ${className}`}
     >
       <span className="flex w-full items-baseline justify-between gap-x-4">
         <h3 className="display" style={{ fontSize: 'clamp(26px, 3.6vw, 46px)', lineHeight: 1 }}>{titleOf(proj.title)}</h3>
@@ -81,15 +81,28 @@ function Row({ proj, active, expanded, onClick, className = '' }) {
   )
 }
 
+// Whether the project is up somewhere: a filled dot for deployed, an empty one otherwise. The caller sets
+// the display (it sits in the card's top row on wide screens, by the links below lg).
+function Status({ deployed, className = '' }) {
+  return (
+    <span className={`label items-center gap-1.5 text-[11px] text-khaki ${className}`}>
+      <i aria-hidden="true" className={`block h-1.5 w-1.5 rounded-full ${deployed ? 'bg-terra' : 'border border-khaki'}`} />
+      {deployed ? 'Deployed' : 'Undeployed'}
+    </span>
+  )
+}
+
 // Wide screens: the project list on the left, the card on the right, both the same height. The list shows a
 // window of six rows; the arrows on its top and bottom bars (or the wheel over it) slide the window one row
 // at a time, handing over to the page at either end. Below lg the list is an accordion: pressing a project
-// folds the other rows away and opens the card right under it; pressing the open row closes it again. The
-// arrows beside the card, and a vertical swipe on it, move to the previous or next project without closing.
+// folds the other rows away, opens the card right under it and brings the stage to the top of the screen so
+// the card has the whole screen to fit in; pressing the open row closes it again. The arrows in the card's
+// top row move to the previous or next project without closing it (swiping the card only scrolls the page).
 // The card has two tabs: Frontend (screenshot and product story) and Backend (system diagram and what runs
 // behind it). Picking a project or a tab cross-fades the card; picking the one already open does nothing.
 export default function Work() {
   const wide = useMediaQuery('(min-width: 1024px)')
+  const reduce = useReducedMotion()
   const [index, setIndex] = useState(0)
   const [open, setOpen] = useState(false)      // accordion, below lg
   const [start, setStart] = useState(0)        // first row in the window, wide screens
@@ -120,8 +133,13 @@ export default function Work() {
     if (open && i === index) { setOpen(false); return }
     pick(i)
     setOpen(true)
+    // The stage's top is a snap point, so the page's own snapping agrees with this move.
+    const section = cardRef.current?.closest('section')
+    if (!section) return
+    const top = section.getBoundingClientRect().top + window.scrollY
+    if (Math.abs(window.scrollY - top) > 2) window.scrollTo({ top, behavior: reduce ? 'instant' : 'smooth' })
   }
-  latest.current = { index, start, step, shift }
+  latest.current = { start, shift }
   useEffect(() => () => clearTimeout(timer.current), [])
 
   // New content is in: glide from the frozen height to the natural one, then let it go.
@@ -141,29 +159,6 @@ export default function Work() {
     const t = setTimeout(done, 500)
     return () => { clearTimeout(t); body.removeEventListener('transitionend', done) }
   }, [shown])
-
-  // Below lg a vertical swipe on the card moves to the previous or next project. The gesture is claimed
-  // only when there is somewhere to go, so at either end the page scrolls as usual.
-  useEffect(() => {
-    const el = cardRef.current
-    if (!el || wide) return
-    let x0 = 0, y0 = 0, mode = null, fired = false
-    const start = (e) => { x0 = e.touches[0].clientX; y0 = e.touches[0].clientY; mode = null; fired = false }
-    const move = (e) => {
-      const dx = e.touches[0].clientX - x0, dy = e.touches[0].clientY - y0
-      if (!mode) {
-        if (Math.abs(dx) < 4 && Math.abs(dy) < 4) return
-        const i = latest.current.index
-        mode = Math.abs(dy) > Math.abs(dx) && ((dy < 0 && i < N - 1) || (dy > 0 && i > 0)) ? 'swap' : 'scroll'
-      }
-      if (mode !== 'swap') return
-      e.preventDefault()
-      if (!fired && Math.abs(dy) > 44) { fired = true; latest.current.step(dy < 0 ? 1 : -1) }
-    }
-    el.addEventListener('touchstart', start, { passive: true })
-    el.addEventListener('touchmove', move, { passive: false })
-    return () => { el.removeEventListener('touchstart', start); el.removeEventListener('touchmove', move) }
-  }, [wide])
 
   // Wide screens: the wheel over the list slides its window a row per 60px, and lets the page scroll once
   // the window is at either end.
@@ -188,67 +183,64 @@ export default function Work() {
   const last = Math.min(N, start + WINDOW) - 1
 
   const card = (
-    <div ref={cardRef} className="grid min-w-0 grid-cols-[minmax(0,1fr)_auto] gap-x-3 lg:block" aria-live="polite">
-      <div className="min-w-0">
-        <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
-          <div className="flex gap-1" role="tablist" aria-label="Project view">
-            {TABS.map((t) => (
-              <button
-                key={t.id}
-                type="button"
-                role="tab"
-                aria-selected={tab === t.id}
-                onClick={() => pickTab(t.id)}
-                className={`label cursor-pointer rounded-full px-3 py-1.5 text-[11px] transition-colors duration-200 ${tab === t.id ? 'bg-terra text-white' : 'text-khaki hover:bg-ink/10 hover:text-ink'}`}
-              >
-                {t.label}
-              </button>
-            ))}
-          </div>
-          <span className="label inline-flex items-center gap-1.5 text-[11px] text-khaki">
-            <i aria-hidden="true" className={`block h-1.5 w-1.5 rounded-full ${p.deployed ? 'bg-terra' : 'border border-khaki'}`} />
-            {p.deployed ? 'Deployed' : 'Undeployed'}
-          </span>
+    <div ref={cardRef} className="min-w-0" aria-live="polite">
+      <div className="mb-2.5 flex items-center justify-between gap-3 lg:mb-3">
+        <div className="flex gap-1" role="tablist" aria-label="Project view">
+          {TABS.map((t) => (
+            <button
+              key={t.id}
+              type="button"
+              role="tab"
+              aria-selected={tab === t.id}
+              onClick={() => pickTab(t.id)}
+              className={`label cursor-pointer rounded-full px-3 py-1.5 text-[11px] transition-colors duration-200 ${tab === t.id ? 'bg-terra text-white' : 'text-khaki hover:bg-ink/10 hover:text-ink'}`}
+            >
+              {t.label}
+            </button>
+          ))}
         </div>
-
-        {/* On wide screens the slots are fixed so the card is the same size for every project and both tabs:
-            a two-line headline, a 2.11:1 media box, a six-line description. Below lg the text runs its full
-            length and the card's height glides between projects. */}
-        <div ref={bodyRef} className={`panel-body grid min-w-0 gap-3 ${fading ? 'fading' : ''}`}>
-          <p className="display hidden text-[22px] leading-none text-terra lg:block">{titleOf(p.title)}</p>
-          <p className="text-[20px] font-semibold leading-tight tracking-[-.01em] lg:line-clamp-2 lg:min-h-[2.5em]">{back ? p.backendHeadline : p.headline}</p>
-          <div className="aspect-[2.11] w-full max-w-full overflow-hidden rounded-[4px] border border-line bg-ground">
-            {back ? (
-              <div className="flex h-full w-full items-center px-3"><Diagram diagram={p.diagram} title={p.title} /></div>
-            ) : (
-              <button type="button" onClick={() => setZoom(true)} className="group block h-full w-full cursor-zoom-in" aria-label={`Enlarge: ${p.image.alt}`}>
-                <img
-                  src={p.image.src}
-                  srcSet={p.image.srcSet}
-                  sizes="(min-width: 1024px) 480px, 90vw"
-                  alt={p.image.alt}
-                  loading="lazy"
-                  className="block h-full w-full object-cover object-top transition-transform duration-500 group-hover:scale-[1.03]"
-                />
-              </button>
-            )}
-          </div>
-          {zoom && <Lightbox src={p.image.src} alt={p.image.alt} onClose={() => setZoom(false)} />}
-          <p className="max-w-[52ch] text-[16px] leading-[1.45] lg:line-clamp-6 lg:min-h-[8.7em]">{back ? p.backend : p.summary}</p>
-          <div className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-3 lg:h-[3.5rem]">
-            <div className="flex flex-wrap gap-1.5 lg:max-h-[3.5rem] lg:overflow-hidden">
-              {p.tech.map((t) => <span key={t} className="label rounded-[4px] border border-line px-2 py-0.5 text-[11.5px] text-khaki">{t}</span>)}
-            </div>
-            <div className="flex gap-4 pt-1 label">
-              {p.links.live && <a className="link-ul" href={p.links.live} target="_blank" rel="noreferrer">Live ↗</a>}
-              {p.links.repo && <a className="link-ul" href={p.links.repo} target="_blank" rel="noreferrer">Code ↗</a>}
-            </div>
-          </div>
+        <Status deployed={p.deployed} className="hidden lg:inline-flex" />
+        <div className="flex gap-1.5 lg:hidden" aria-label="Switch project">
+          <Arrow dir={-1} onClick={() => step(-1)} />
+          <Arrow dir={1} onClick={() => step(1)} />
         </div>
       </div>
-      <div className="flex flex-col justify-center gap-2 lg:hidden" aria-label="Switch project">
-        <Arrow dir={-1} onClick={() => step(-1)} />
-        <Arrow dir={1} onClick={() => step(1)} />
+
+      {/* On wide screens the slots are fixed so the card is the same size for every project and both tabs:
+          a two-line headline, a 2.11:1 media box, a six-line description. Below lg the type is a step
+          smaller so the whole card fits a phone screen, the text runs its full length, and the card's
+          height glides between projects. */}
+      <div ref={bodyRef} className={`panel-body grid min-w-0 gap-2.5 lg:gap-3 ${fading ? 'fading' : ''}`}>
+        <p className="display hidden text-[22px] leading-none text-terra lg:block">{titleOf(p.title)}</p>
+        <p className="text-[17px] font-semibold leading-tight tracking-[-.01em] lg:line-clamp-2 lg:min-h-[2.5em] lg:text-[20px]">{back ? p.backendHeadline : p.headline}</p>
+        <div className="aspect-[2.11] w-full max-w-full overflow-hidden rounded-[4px] border border-line bg-ground">
+          {back ? (
+            <div className="flex h-full w-full items-center px-3"><Diagram diagram={p.diagram} title={p.title} /></div>
+          ) : (
+            <button type="button" onClick={() => setZoom(true)} className="group block h-full w-full cursor-zoom-in" aria-label={`Enlarge: ${p.image.alt}`}>
+              <img
+                src={p.image.src}
+                srcSet={p.image.srcSet}
+                sizes="(min-width: 1024px) 480px, 90vw"
+                alt={p.image.alt}
+                loading="lazy"
+                className="block h-full w-full object-cover object-top transition-transform duration-500 group-hover:scale-[1.03]"
+              />
+            </button>
+          )}
+        </div>
+        {zoom && <Lightbox src={p.image.src} alt={p.image.alt} onClose={() => setZoom(false)} />}
+        <p className="max-w-[52ch] text-[14.5px] leading-[1.45] lg:line-clamp-6 lg:min-h-[8.7em] lg:text-[16px]">{back ? p.backend : p.summary}</p>
+        <div className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-3 lg:h-[3.5rem]">
+          <div className="flex flex-wrap gap-1.5 lg:max-h-[3.5rem] lg:overflow-hidden">
+            {p.tech.map((t) => <span key={t} className="label rounded-[4px] border border-line px-1.5 py-0.5 text-[10.5px] text-khaki lg:px-2 lg:text-[11.5px]">{t}</span>)}
+          </div>
+          <div className="flex flex-col items-end gap-1.5 label lg:flex-row lg:items-start lg:gap-4 lg:pt-1">
+            <Status deployed={p.deployed} className="inline-flex lg:hidden" />
+            {p.links.live && <a className="link-ul" href={p.links.live} target="_blank" rel="noreferrer">Live ↗</a>}
+            {p.links.repo && <a className="link-ul" href={p.links.repo} target="_blank" rel="noreferrer">Code ↗</a>}
+          </div>
+        </div>
       </div>
     </div>
   )
@@ -284,7 +276,7 @@ export default function Work() {
           })}
           <div className={`acc-panel ${open ? 'open' : ''}`} aria-hidden={!open} inert={!open}>
             <div>
-              <div className="border border-t-0 border-ink bg-ground p-4">{card}</div>
+              <div className="border border-t-0 border-ink bg-ground p-3">{card}</div>
             </div>
           </div>
         </div>

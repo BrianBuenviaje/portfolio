@@ -3,9 +3,13 @@ import { LOGOS } from '../data/logos.js'
 import { useReducedMotion } from '../lib/util.js'
 
 const N = LOGOS.length
-const STEP_MS = 320      // gap between one logo starting to draw and the next, whatever the input rate
-const DRAW_MS = 1500     // ring, mark and label of one logo
-const SETTLE_MS = 700    // pause after the last logo before the page is allowed to move on
+const STEP_MS = 180      // gap between one logo starting to draw and the next, whatever the input rate
+const DRAW_MS = 850      // ring, mark and label of one logo (matches the transitions in index.css)
+const SETTLE_MS = 200    // pause after the last logo before the page is allowed to move on
+const HURRY_STEP_MS = 90 // the gap and the pause once the reader scrolls on with everything already queued
+const HURRY_END_MS = 450
+const WHEEL_PX = 33      // wheel travel per logo: a notch of a mouse wheel (100px) draws three
+const TOUCH_PX = 28      // finger travel per logo
 
 function Logo({ logo, on, size }) {
   const ref = useRef(null)
@@ -94,34 +98,39 @@ export default function Specializations() {
   const reduce = useReducedMotion()
   const [count, setCount] = useState(0)    // how many have been asked for
   const [shown, setShown] = useState(0)    // how many are drawn; walks toward count one at a time, never back
+  const [hurry, setHurry] = useState(false)   // the reader scrolled on with all of them already queued
   const [done, setDone] = useState(false)
   const [locked, setLocked] = useState(false)
-  // Mirrors of done/locked for the scroll handlers, set at the same moment as the state so nothing waits
-  // for a render. armed goes false on a release and true again once the stage has mostly left the screen.
-  const doneRef = useRef(false), lockedRef = useRef(false), armed = useRef(true), lockY = useRef(0)
+  // Mirrors of count/done/locked for the scroll handlers, set at the same moment as the state so nothing
+  // waits for a render. armed goes false on a release and true again once the stage has mostly left the screen.
+  const countRef = useRef(0), doneRef = useRef(false), lockedRef = useRef(false), armed = useRef(true), lockY = useRef(0)
   const settling = useRef(false)   // gliding back after an overshoot; the pin and the drawing wait for it
   const letGo = useRef(null)       // detaches the hold's input listeners
+  const startedAt = useRef(-1e9)   // when the latest logo started drawing
   const { rows, cell, ring, shifts } = useLayout(ref)
 
   const finish = () => {
-    doneRef.current = true; lockedRef.current = false; settling.current = false
+    countRef.current = N; doneRef.current = true; lockedRef.current = false; settling.current = false
     letGo.current?.()
     setCount(N); setShown(N); setDone(true); setLocked(false)
   }
 
-  // The queue.
+  // The queue: the first logo of an idle queue starts at once, the rest follow a step apart. The step
+  // shortens once the reader has scrolled on with everything queued, so the sequence hurries to its end.
   useEffect(() => {
     if (shown >= count) return
-    const t = setTimeout(() => setShown((s) => Math.min(N, s + 1)), reduce ? 0 : STEP_MS)
+    const gap = reduce ? 0 : (hurry ? HURRY_STEP_MS : STEP_MS)
+    const t = setTimeout(() => { startedAt.current = performance.now(); setShown((s) => Math.min(N, s + 1)) }, Math.max(0, gap - (performance.now() - startedAt.current)))
     return () => clearTimeout(t)
-  }, [shown, count, reduce])
+  }, [shown, count, reduce, hurry])
 
-  // All drawn: let the last one finish, settle, then release the page.
+  // All drawn: let the last one finish, settle, then release the page (sooner when hurried).
   useEffect(() => {
     if (done || shown < N) return
-    const t = setTimeout(finish, reduce ? 0 : DRAW_MS + SETTLE_MS)
+    const total = reduce ? 0 : (hurry ? HURRY_END_MS : DRAW_MS + SETTLE_MS)
+    const t = setTimeout(finish, Math.max(0, total - (performance.now() - startedAt.current)))
     return () => clearTimeout(t)
-  }, [shown, done, reduce])   // eslint-disable-line react-hooks/exhaustive-deps
+  }, [shown, done, reduce, hurry])   // eslint-disable-line react-hooks/exhaustive-deps
 
   // Reduced motion: everything at once, never hold the page.
   useEffect(() => { if (reduce) finish() }, [reduce])   // eslint-disable-line react-hooks/exhaustive-deps
@@ -140,16 +149,21 @@ export default function Specializations() {
     const section = ref.current?.closest('section')
     if (!section) return
     let acc = 0, touchY = null, lastY = window.scrollY
-    const request = (n = 1) => setCount((c) => Math.min(N, c + n))
-    // Every 60px of wheel travel asks for one more logo, so a flick queues several; the queue still
+    // Asking for more once all are queued means the reader is scrolling on: hurry the rest.
+    const request = (n = 1) => {
+      if (countRef.current >= N) { setHurry(true); return }
+      countRef.current = Math.min(N, countRef.current + n)
+      setCount(countRef.current)
+    }
+    // Every WHEEL_PX of wheel travel asks for one more logo, so a flick queues several; the queue still
     // draws them one at a time. Gestures during the glide back are swallowed, not counted.
     const onWheel = (e) => {
       if (e.deltaY < 0) { release(); return }
       e.preventDefault()
       if (settling.current) return
       acc += e.deltaY
-      const n = Math.floor(acc / 60)
-      if (n > 0) { acc -= n * 60; request(n) }
+      const n = Math.floor(acc / WHEEL_PX)
+      if (n > 0) { acc -= n * WHEEL_PX; request(n) }
     }
     const onTouchStart = (e) => { touchY = e.touches[0].clientY }
     const onTouchMove = (e) => {
@@ -158,10 +172,12 @@ export default function Specializations() {
       if (dy < -30) { release(); return }
       e.preventDefault()
       if (settling.current) return
-      if (dy > 36) { touchY = e.touches[0].clientY; request() }
+      const n = Math.floor(dy / TOUCH_PX)
+      if (n > 0) { touchY -= n * TOUCH_PX; request(n) }
     }
+    // An arrow key draws two, a page key three.
     const onKey = (e) => {
-      if (['ArrowDown', 'PageDown', ' ', 'End'].includes(e.key)) { e.preventDefault(); if (!settling.current) request() }
+      if (['ArrowDown', 'PageDown', ' ', 'End'].includes(e.key)) { e.preventDefault(); if (!settling.current) request(e.key === 'ArrowDown' ? 2 : 3) }
       else if (['ArrowUp', 'PageUp', 'Home'].includes(e.key)) release()
     }
     // Input listeners live only while held, attached the moment the hold starts (not after a render),
@@ -220,7 +236,8 @@ export default function Specializations() {
     window.addEventListener('scroll', onScroll, { passive: true })
     letGo.current = unhold
     check(true)   // a page restored or re-mounted at this stage holds straight away
-    return () => { io.disconnect(); unhold(); window.removeEventListener('scroll', onScroll); letGo.current = null }
+    // Tearing down lets go completely, so a re-run of this effect (React's dev double mount) starts clean.
+    return () => { io.disconnect(); unhold(); lockedRef.current = false; settling.current = false; window.removeEventListener('scroll', onScroll); letGo.current = null }
   }, [reduce])
 
   return (
