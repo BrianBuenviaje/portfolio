@@ -89,7 +89,7 @@ export default function Contact() {
   ].filter(Boolean)
 
   const note = {
-    idle: 'Goes straight to my inbox.',
+    idle: canSend ? 'Goes straight to my inbox.' : 'Opens your email app with this message.',
     sending: 'Sending…',
     sent: 'Sent. It is in my inbox now.',
     error: `That did not go through. Write to ${SITE.email} instead.`,
