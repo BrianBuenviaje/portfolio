@@ -86,6 +86,9 @@ export default function App() {
           <Stage stage={byId.build}><Work /></Stage>
           <Stage stage={byId.ship}><Experience /></Stage>
           <Stage stage={byId.contact} after={<Footer />}><Contact /></Stage>
+          {/* The page's very bottom is a snap position of its own. Without it, when the last stage is
+              taller than the screen its top snap point pulls the page back up and hides the footer. */}
+          <div className="snap-end h-0" aria-hidden="true" />
         </div>
       </div>
     </>

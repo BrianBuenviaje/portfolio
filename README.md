@@ -34,13 +34,19 @@ projects is still there but unused since the card dropped the diagram.
   they never appear in bursts however fast the page is scrolled.
 - Scroll snapping is `proximity`, not `mandatory`, so the pinned section can rest at any point.
 - Every motion respects `prefers-reduced-motion`: no stamp, no drips growing, everything visible.
-- The commit-log guestbook saves entries in the visitor's own browser (`localStorage`) only. Shared
-  entries would need a small backend or a hosted store.
+- The commit-log form sends its message to Brian's inbox through EmailJS, called straight from the
+  browser (the approach the first portfolio's contact form was written for). It needs three settings at
+  build time: `VITE_EMAILJS_SERVICE_ID`, `VITE_EMAILJS_TEMPLATE_ID`, `VITE_EMAILJS_PUBLIC_KEY`. The
+  template receives `from_name`, `from_email`, `reply_to`, `subject` and `message`. Without the
+  settings the form opens the visitor's own mail app with the message written out, so nothing is ever
+  silently dropped. The log under the form is the visitor's own record of what they sent, kept in
+  their browser (`localStorage`). A hidden field catches bots.
 
 ## Deploy
 
 Static site. On Vercel: import the repo, framework "Vite", build `npm run build`, output `dist`.
-Nothing else to configure. After the first deploy, set the two `og:image` / `twitter:image` tags in
+For the message form to send, add the three `VITE_EMAILJS_*` variables (see `.env.example`) under the
+project's Environment Variables and redeploy; for local work put them in `.env.local`. After the first deploy, set the two `og:image` / `twitter:image` tags in
 `index.html` to the absolute URL (`https://<domain>/og.jpg`); most link scrapers ignore relative paths.
 
 ## Still to confirm
@@ -48,4 +54,4 @@ Nothing else to configure. After the first deploy, set the two `og:image` / `twi
 - Internship dates: the site uses the ones from the previous portfolio (HydraMed Feb–May 2026,
   WebDiner Nov 2025–Jan 2026); the résumé PDFs differ.
 - Featured projects: currently Jebran Miki, Malagos Garden, Keystroke Auth.
-- Hero additions (on hold) and whether the guestbook needs real shared entries.
+- Hero additions (on hold).
