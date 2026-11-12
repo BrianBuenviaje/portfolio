@@ -4,13 +4,13 @@ import { SITE } from '../data/content.js'
 const KEY = 'commit-log'
 
 // Delivery is EmailJS, called straight from the browser, the way the first portfolio's contact form was
-// written: the same three settings under the same names, and the same template fields. They are public
-// identifiers (they ship to every visitor); the host supplies them at build time. Until they are set the
-// form hands the message to the visitor's own mail app instead of pretending to have sent it.
+// written. The three identifiers are public (they ship to every visitor) and live in content.js; a build
+// can swap them through the VITE_EMAILJS_* settings. With none at all the form hands the message to the
+// visitor's own mail app instead of pretending to have sent it.
 const MAIL = {
-  service: import.meta.env.VITE_EMAILJS_SERVICE_ID,
-  template: import.meta.env.VITE_EMAILJS_TEMPLATE_ID,
-  key: import.meta.env.VITE_EMAILJS_PUBLIC_KEY,
+  service: import.meta.env.VITE_EMAILJS_SERVICE_ID || SITE.mail?.service,
+  template: import.meta.env.VITE_EMAILJS_TEMPLATE_ID || SITE.mail?.template,
+  key: import.meta.env.VITE_EMAILJS_PUBLIC_KEY || SITE.mail?.key,
 }
 const canSend = Boolean(MAIL.service && MAIL.template && MAIL.key)
 
@@ -22,7 +22,9 @@ async function deliver({ name, email, message }) {
       service_id: MAIL.service,
       template_id: MAIL.template,
       user_id: MAIL.key,
-      template_params: { from_name: name, from_email: email, reply_to: email, subject: `Portfolio message from ${name}`, message },
+      // The account's template builds its body from from_email, subject and message, and takes Reply-To
+      // from {{email}}; name and reply_to cover a template written the usual way.
+      template_params: { from_name: name, from_email: email, name, email, reply_to: email, subject: `Portfolio message from ${name}`, message },
     }),
   })
   if (!res.ok) throw new Error(`EmailJS answered ${res.status}`)

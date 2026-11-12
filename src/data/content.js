@@ -16,6 +16,9 @@ export const SITE = {
   instagram: '',                                               // TODO(owner): add profile URL; the icon shows once this is filled
   resume: '/Resume.pdf',
   built: 'React + Vite + Tailwind',
+  // EmailJS identifiers for the message form. Public by design: they ship to every visitor inside the
+  // page's script. The account's "Contact Us" template decides where a message lands and how it reads.
+  mail: { service: 'service_2pb94m8', template: 'template_w4z7n68', key: 'F8OXsjsINmmLqeybk' },
 }
 
 // Stages on the rail. id doubles as the anchor and the nav key; each heading is led by a '>' mark.

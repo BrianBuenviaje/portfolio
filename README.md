@@ -35,18 +35,29 @@ projects is still there but unused since the card dropped the diagram.
 - Scroll snapping is `proximity`, not `mandatory`, so the pinned section can rest at any point.
 - Every motion respects `prefers-reduced-motion`: no stamp, no drips growing, everything visible.
 - The commit-log form sends its message to Brian's inbox through EmailJS, called straight from the
-  browser (the approach the first portfolio's contact form was written for). It needs three settings at
-  build time: `VITE_EMAILJS_SERVICE_ID`, `VITE_EMAILJS_TEMPLATE_ID`, `VITE_EMAILJS_PUBLIC_KEY`. The
-  template receives `from_name`, `from_email`, `reply_to`, `subject` and `message`. Without the
-  settings the form opens the visitor's own mail app with the message written out, so nothing is ever
-  silently dropped. The log under the form is the visitor's own record of what they sent, kept in
-  their browser (`localStorage`). A hidden field catches bots.
+  browser (the approach the first portfolio's contact form was written for). Its three identifiers
+  (service, template, public key) are public by design and live in `SITE.mail` in
+  `src/data/content.js`; a build can swap them with `VITE_EMAILJS_SERVICE_ID`,
+  `VITE_EMAILJS_TEMPLATE_ID` and `VITE_EMAILJS_PUBLIC_KEY`. The form sends `from_name`, `from_email`,
+  `name`, `email`, `reply_to`, `subject` and `message`; the account's "Contact Us" template builds
+  its body from `from_email`, `subject` and `message`, takes Reply-To from `email`, and delivers to
+  the address set as its "To Email". With no identifiers at all the form opens the visitor's own mail
+  app with the message written out, so nothing is ever silently dropped. The log under the form is
+  the visitor's own record of what they sent, kept in their browser (`localStorage`). A hidden field
+  catches bots.
+- If a send fails with `412 Gmail_API: Invalid grant`, the EmailJS account's connection to Gmail has
+  expired: reconnect it under Email Services in the EmailJS dashboard (Disconnect, Connect Account,
+  Update Service). `412 Gmail_API: Request had insufficient authentication scopes` means the
+  reconnect went through without Google's "Send email on your behalf" permission: reconnect again
+  and allow it. Until then the form tells the visitor it did not go through, keeps their text and
+  shows the address to write to.
 
 ## Deploy
 
 Static site. On Vercel: import the repo, framework "Vite", build `npm run build`, output `dist`.
-For the message form to send, add the three `VITE_EMAILJS_*` variables (see `.env.example`) under the
-project's Environment Variables and redeploy; for local work put them in `.env.local`. After the first deploy, set the two `og:image` / `twitter:image` tags in
+The message form sends with the identifiers in `src/data/content.js`; to point a deployment at a
+different EmailJS account, set the three `VITE_EMAILJS_*` variables (see `.env.example`) under the
+project's Environment Variables, or in `.env.local` for local work. After the first deploy, set the two `og:image` / `twitter:image` tags in
 `index.html` to the absolute URL (`https://<domain>/og.jpg`); most link scrapers ignore relative paths.
 
 ## Still to confirm
