@@ -12,6 +12,7 @@ npm install
 npm run dev        # http://localhost:5173
 npm run build      # production build into dist/
 npm run preview    # serve dist/ at http://localhost:4173
+npm run resume     # print resume/resume.html to public/Resume.pdf (needs Chrome or Edge)
 ```
 
 ## Where things live
@@ -23,6 +24,7 @@ npm run preview    # serve dist/ at http://localhost:4173
 | Colours, fonts, motion rules | `src/index.css` (the `@theme` block at the top) |
 | Sections | `src/components/*.jsx`, composed in `src/App.jsx` |
 | Project screenshots, certificates, résumé, link-preview image | `public/` |
+| Résumé source (prints to `public/Resume.pdf`) | `resume/resume.html`, built by `resume/build.mjs` |
 
 To change a project, an experience entry or a link, edit `content.js` only. Diagram data for the
 projects is still there but unused since the card dropped the diagram.
@@ -60,9 +62,19 @@ different EmailJS account, set the three `VITE_EMAILJS_*` variables (see `.env.e
 project's Environment Variables, or in `.env.local` for local work. After the first deploy, set the two `og:image` / `twitter:image` tags in
 `index.html` to the absolute URL (`https://<domain>/og.jpg`); most link scrapers ignore relative paths.
 
+## Résumé
+
+`public/Resume.pdf` is printed from `resume/resume.html` by `npm run resume` (headless Chrome or
+Edge; set `CHROME_PATH` if neither is in its usual place). It is one A4 page in Times New Roman, and
+the build fails if an edit pushes it onto a second page.
+
+Dates, hours and titles come from the certificates in `public/experiences`: GAC Infinity Hub
+May 18 – Jun 22 2026 (240 hours), HydraMed Feb 10 – Mar 31 2026 (180 hours), WebDiner Nov 15 2025 –
+Jan 15 2026, CCNA completed 6 Apr 2026. The site's Experience stage uses the same dates. Project
+lines follow each repository's commit history, and the GAC Infinity Hub lines follow the OJT
+narrative report.
+
 ## Still to confirm
 
-- Internship dates: the site uses the ones from the previous portfolio (HydraMed Feb–May 2026,
-  WebDiner Nov 2025–Jan 2026); the résumé PDFs differ.
 - Featured projects: currently Jebran Miki, Malagos Garden, Keystroke Auth.
 - Hero additions (on hold).

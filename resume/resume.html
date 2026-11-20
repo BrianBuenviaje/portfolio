@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Resume - Brian Vincent Alfred D. Buenviaje</title>
+<!--
+  Source of public/Resume.pdf. Edit the words here, then run `npm run resume` to print it again.
+  It has to stay on one A4 page; the build fails if it runs onto a second one.
+  Every line follows a record: the certificates in public/experiences (dates, hours, titles), each
+  project's commit history (who built what), and the OJT narrative report (the GAC Infinity Hub work).
+-->
+<style>
+  @page { size: A4; margin: 13mm 15mm; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { font: 10pt/1.28 'Times New Roman', 'Liberation Serif', 'Nimbus Roman', Times, serif; color: #000; }
+
+  h1 { font-size: 17pt; line-height: 1.15; text-align: center; text-transform: uppercase; }
+  .contact { margin-top: 3pt; font-size: 9.5pt; text-align: center; color: #333; }
+  .contact a { color: #000; text-decoration: none; }
+  .contact span { margin: 0 3pt; color: #555; }
+
+  h2 { margin: 9pt 0 4pt; padding-bottom: 1.5pt; border-bottom: 0.75pt solid #000; font-size: 11pt; line-height: 1.2; letter-spacing: 0.03em; text-transform: uppercase; }
+
+  .entry { break-inside: avoid; }
+  .entry + .entry { margin-top: 5pt; }
+  .line { display: flex; justify-content: space-between; align-items: baseline; gap: 14pt; }
+  .line > :last-child { flex: none; font-style: italic; }
+  .org { font-weight: bold; text-transform: uppercase; }
+  .title { font-weight: bold; }
+  .role { font-style: italic; }
+  .bar { margin: 0 3pt; }
+
+  ul { margin-top: 1.5pt; padding-left: 13.5pt; list-style: none; }
+  li { position: relative; margin-top: 1.5pt; text-align: justify; }
+  li::before { content: '\2022'; position: absolute; left: -6.5pt; }
+
+  .skills { display: grid; grid-template-columns: max-content 1fr; column-gap: 10pt; row-gap: 2.5pt; }
+  .skills dt { font-weight: bold; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Brian Vincent Alfred D. Buenviaje</h1>
+  <p class="contact">
+    +63 920 237 5779 <span>|</span>
+    <a href="mailto:bvadbuenviaje@addu.edu.ph">bvadbuenviaje@addu.edu.ph</a> <span>|</span>
+    <a href="https://brianbuenviaje.vercel.app">brianbuenviaje.vercel.app</a> <span>|</span>
+    <a href="https://www.linkedin.com/in/brianbuenviaje/">linkedin.com/in/brianbuenviaje</a>
+  </p>
+</header>
+
+<section>
+  <h2>Education</h2>
+  <div class="entry">
+    <div class="line"><span class="org">Ateneo de Davao University</span><span>Davao City, Philippines</span></div>
+    <div class="line"><span class="role">Bachelor of Science in Computer Science</span><span>Expected 2027</span></div>
+    <ul>
+      <li><b>Academic Performance:</b> 1st Year Annual QPI: 3.780; 2nd Year Annual QPI: 3.880</li>
+      <li><b>Certification:</b> CCNA: Introduction to Networks, Cisco Networking Academy (April 2026)</li>
+    </ul>
+  </div>
+</section>
+
+<section>
+  <h2>Work Experience</h2>
+  <div class="entry">
+    <div class="line"><span class="org">GAC Infinity Hub Corporation</span><span>Davao City, Philippines</span></div>
+    <div class="line"><span class="role">Web Developer, On-the-Job Trainee</span><span>May 2026 – Jun 2026</span></div>
+    <ul>
+      <li>Developed features for ManPro Academy, an EdTech learning platform built with Laravel 12, React 18, Inertia, and Material UI, and helped connect its main system and courses platform through Single Sign-On with role mapping.</li>
+      <li>Owned course payments: integrated PayMongo checkout for course registration and debugged the payment flow.</li>
+      <li>Built the forms and survey system: a mentor dashboard, reusable forms linked across courses, QR-code access with email one-time-password verification, and encrypted routes for forms and responses.</li>
+    </ul>
+  </div>
+  <div class="entry">
+    <div class="line"><span class="org">HydraMed</span><span>Remote</span></div>
+    <div class="line"><span class="role">Technical Intern, APEX Enterprise Platform Development</span><span>Feb 2026 – Mar 2026</span></div>
+    <ul>
+      <li>Contributed to APEX, an integrated telehealth enterprise resource platform, supporting modules for Electronic Health Records (EHR) and patient data management.</li>
+      <li>Assisted with CRM and sales automation for healthcare outreach, and with internal hiring and marketing tools.</li>
+      <li>Helped develop and verify financial logic for accounting, payroll, and billing.</li>
+    </ul>
+  </div>
+  <div class="entry">
+    <div class="line"><span class="org">WebDiner LLC</span><span>Remote</span></div>
+    <div class="line"><span class="role">Website Design Intern</span><span>Nov 2025 – Jan 2026</span></div>
+    <ul>
+      <li>Developed responsive, user-centered client websites, translating business requirements into working features.</li>
+      <li>Optimized page speed and SEO-ready site structure, and assisted with deployment and quality assurance of live client sites.</li>
+    </ul>
+  </div>
+</section>
+
+<section>
+  <h2>Project Experience</h2>
+  <div class="entry">
+    <div class="line"><span><span class="title">Soil Condition States from Low-Cost IoT Sensor Data</span><span class="bar">|</span><span class="role">Undergraduate Thesis</span></span><span>2026</span></div>
+    <ul>
+      <li>Identified four recurring soil condition states, without laboratory labels, from 3,029 hourly moisture, pH, and temperature readings across five IoT sensor nodes, validated by leaving one node out.</li>
+      <li>Trained a Random Forest that assigns new readings to a state at 93.1% accuracy, and built a phone app that turns each state into irrigation and nutrient advice through a rule-based expert system.</li>
+    </ul>
+  </div>
+  <div class="entry">
+    <div class="line"><span><span class="title">Masquerade</span><span class="bar">|</span><span class="role">Solo Developer</span></span><span>2026</span></div>
+    <ul>
+      <li>Built a real-time multiplayer social deduction game as a PWA with React, TypeScript, Express, and Socket.IO; roles, secret words, timers, and phases live on the server, so each client receives only what its role may see.</li>
+      <li>Added Gemini-powered bots that join as ordinary socket clients, read the clue log, and vote.</li>
+    </ul>
+  </div>
+  <div class="entry">
+    <div class="line"><span><span class="title">MedPal</span><span class="bar">|</span><span class="role">Developer, Team Project</span></span><span>2026</span></div>
+    <ul>
+      <li>Completed the core API routes (scan, drug interactions, records, reminders) of a Next.js PWA that reads a prescription photo with AWS Textract, Comprehend Medical, and Bedrock and explains it in Bisaya, Filipino, or English.</li>
+    </ul>
+  </div>
+  <div class="entry">
+    <div class="line"><span><span class="title">Jebran Miki Factory Website</span><span class="bar">|</span><span class="role">Full-Stack Developer, Team Project</span></span><span>2025</span></div>
+    <ul>
+      <li>Built JWT sign-in (email or username) and role-based access for customers, resellers, admins, and superadmins in a Django REST Framework, PostgreSQL, and React ordering and operations system.</li>
+      <li>Designed the inventory API and data model for suppliers, ingredients, and ingredient batches with expiry dates.</li>
+    </ul>
+  </div>
+  <div class="entry">
+    <div class="line"><span><span class="title">Malagos Garden Resort Website</span><span class="bar">|</span><span class="role">Frontend Developer, Team of Two</span></span><span>2025</span></div>
+    <ul>
+      <li>Co-developed a responsive, mobile-first redesign of the resort’s website in HTML, CSS, and vanilla JavaScript.</li>
+    </ul>
+  </div>
+</section>
+
+<section>
+  <h2>Skills &amp; Technical Proficiencies</h2>
+  <dl class="skills">
+    <dt>Frontend Development:</dt><dd>HTML5, CSS3, JavaScript, TypeScript, React, Next.js, Tailwind CSS, Material UI</dd>
+    <dt>Backend &amp; Databases:</dt><dd>Python, Django REST Framework, PHP, Laravel, Node.js, Socket.IO, Java, PostgreSQL</dd>
+    <dt>Cloud, AI &amp; Data:</dt><dd>AWS (Textract, Comprehend Medical, Bedrock), Gemini API, Supabase, scikit-learn, pandas</dd>
+    <dt>Tools &amp; Platforms:</dt><dd>Git, GitHub, WordPress, Call Tracking Metrics (CTM), Basic Game Development (C#, Unity)</dd>
+  </dl>
+</section>
+
+</body>
+</html>

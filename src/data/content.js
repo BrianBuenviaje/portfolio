@@ -1,5 +1,5 @@
 // All copy in one place. Words come from the previous portfolio (portfolio_2), tightened.
-// Dates follow portfolio_2/src/data/experience.js; the two PDFs disagree, so confirm before launch.
+// Experience dates follow the certificates in public/experiences; the résumé (resume/resume.html) uses the same ones.
 
 export const SITE = {
   first: 'Brian',
@@ -201,7 +201,7 @@ export const EXPERIENCE = [
   },
   {
     id: 'hydramed',
-    when: 'Feb 2026 — May 2026',
+    when: 'Feb 2026 — Mar 2026',
     org: 'HydraMed',
     role: 'Technical intern · APEX telehealth ERP · Davao City',
     bullets: [
